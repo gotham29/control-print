@@ -1,0 +1,34 @@
+alg: htm #lstm #htm, dtw, edr
+train_models: true
+data_cap: 1000
+hz: 5
+lstm_n_epochs: 100
+test_indices:
+  - 1
+  - 2
+  - 3
+features:
+  - xs
+  - ys
+  - zs
+  - dists
+algs_types:
+  lstm: prediction
+  htm: anomaly
+  dtw: distance
+  edr: distance
+colinds_features:
+  '0.3': xs
+  '0.4': ys
+  '0.5': zs
+  '0.8': dists_x
+  '0.9': dists_y
+  '0.10': dists_z
+  '0': dists
+dirs:
+  htm_src: /Users/samheiserman/Desktop/repos/htm_streamer
+  htm_config: /Users/samheiserman/Desktop/PhD/Motion-Print/configs/htm.yaml
+  input: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_raw
+  output_data: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_preprocessed
+  output_models: /Users/samheiserman/Desktop/PhD/Motion-Print/output/models
+  output_results: /Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores
