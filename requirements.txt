@@ -1,0 +1,12 @@
+#See http://www.pip-installer.org/en/latest/requirements.html for details
+
+PyYAML
+pandas
+numpy
+pandas
+pickle5
+dtw-python
+editdistance
+keras
+tensorflow
+
