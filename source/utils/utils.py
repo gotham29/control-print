@@ -1,0 +1,193 @@
+import argparse
+import os
+import pickle
+
+import yaml
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-cp', '--config_path', required=True,
+                        help='path to config')
+    return parser.parse_args()
+
+
+def make_dir(mydir):
+    if not os.path.exists(mydir):
+        os.mkdir(mydir)
+
+
+def load_config(yaml_path):
+    """
+    Purpose:
+        Load config from path
+    Inputs:
+        yaml_path
+            type: str
+            meaning: .yaml path to load from
+    Outputs:
+        cfg
+            type: dict
+            meaning: config (yaml) -- loaded
+    """
+    with open(yaml_path, 'r') as yamlfile:
+        cfg = yaml.load(yamlfile, Loader=yaml.FullLoader)
+    return cfg
+
+
+def save_data_as_pickle(data_struct, f_path):
+    """
+    Purpose:
+        Save data to pkl file
+    Inputs:
+        data_struct
+            type: any
+            meaning: data to save in pkl format
+        f_path
+            type: str
+            meaning: path to pkl file
+    Outputs:
+        True
+            type: bool
+            meaning: function ran
+    """
+    with open(f_path, 'wb') as handle:
+        pickle.dump(data_struct, handle)
+    return True
+
+
+def validate_config(config):
+    print('\nValidating Config...')
+    # Ensure expected keys present and correct type
+    keys_dtypes = {
+        'alg': str,
+        'lstm_n_epochs': int,
+        'data_cap': int,
+        'hz': int,
+        'test_indices': list,
+        'features': list,
+        'train_models': bool,
+        'dirs': dict,
+        'algs_types': dict,
+        'colinds_features': dict,
+    }
+    keys_missing = []
+    keys_wrongdtypes = {}
+    for k, dtype in keys_dtypes.items():
+        if k not in config:
+            keys_missing.append(k)
+        continue
+        if not isinstance(config[k], dtype):
+            keys_wrongdtypes[k] = type(config[k])
+    assert len(keys_missing) == 0, f"  Expected keys missing --> {sorted(keys_missing)}"
+    for k, wrongdtype in keys_wrongdtypes.items():
+        print(f"  {k} found type -->{wrongdtype}; expected --> {keys_dtypes[k]}")
+    assert len(keys_wrongdtypes) == 0, "  wrong data types"
+
+    # Ensure paths exist
+    for dir_type, dir in config['dirs'].items():
+        if dir_type == 'htm' and config['alg'] != 'htm':
+            continue
+        if dir_type not in ['output_models', 'output_results']:
+            assert os.path.exists(dir), f"{dir_type} not found! --> {dir}"
+        else:
+            # make sub-folders for models & results (but no models for distance algs)
+            if dir_type == 'output_models' and config['algs_types'][config['alg']] == 'distance':
+                continue
+            dir_alg = os.path.join(dir, config['alg'])
+            make_dir(dir_alg)
+            subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']}"
+            dir_sub = os.path.join(dir, config['alg'], subfolder)
+            make_dir(dir_sub)
+            config['dirs'][dir_type] = dir_sub
+
+    # Ensure alg is valid
+    algs_valid = ['lstm', 'htm', 'dtw', 'edr']
+    assert config['alg'] in algs_valid, f"alg should be one of --> {algs_valid}; found --> {config['alg']}"
+
+    # Ensure alg_types is valid
+    types_valid = ['prediction', 'anomaly', 'distance']
+    for alg, algtype in config['algs_types'].items():
+        assert alg in algs_valid, f"all algs in algs_types should be in --> {algs_valid}; found --> {alg}"
+        assert algtype in types_valid, f"all types in algs_types should be in --> {types_valid}; found --> {algtype}"
+
+    # Ensure data_cap >= 100
+    assert config['data_cap'] >= 100, f"  data_cap expected >= 1000, found --> {config['data_cap']}"
+
+    # Ensure 1 <= hz <= 100
+    assert 1 <= config['hz'] <= 100, f"  hz expected 1 - 100 found --> {config['hz']}"
+
+    # Ensure 100 <= lstm_n_epochs <= 500
+    assert 100 <= config[
+        'lstm_n_epochs'] < 500, f"  lstm_n_epochs expected 100 - 500 found --> {config['lstm_n_epochs']}"
+
+    # Ensure test_indicies range from 1 - 15
+    non_ints = []
+    ints_over15 = []
+    for v in config['test_indices']:
+        if not isinstance(v, int):
+            non_ints.append(v)
+        continue
+        if v > 15:
+            ints_over15.append(v)
+    assert len(non_ints) == 0, f"  Non-integers found in test_indices --> {sorted(non_ints)}"
+    assert len(ints_over15) == 0, f"  Integers over 15 found in test_indices --> {sorted(ints_over15)}"
+
+    # Ensure fields in colinds_features
+    invalid_fields = []
+    for f in config['features']:
+        if f not in config['colinds_features'].values():
+            invalid_fields.append(f)
+    assert len(
+        invalid_fields) == 0, f"  Invalid fields found --> {sorted(invalid_fields)}; \n  Valids --> {list(config['colinds_features'].values())}"
+
+    print(f"  alg = {config['alg']}")
+    print(f"  train_models = {config['train_models']}")
+    print(f"  hz = {config['hz']}")
+    print(f"  data_cap = {config['data_cap']}")
+    print(f"  features = {config['features']}")
+    print(f"  test_indices = {config['test_indices']}")
+    print('  DONE')
+
+
+def load_models(dir_models):
+    """
+    Purpose:
+        Load pkl models for each feature from dir
+    Inputs:
+        dir_models
+            type: str
+            meaning: path to dir where pkl models are loaded from
+    Outputs:
+        features_models
+            type: dict
+            meaning: model obj for each feature
+    """
+    pkl_files = [f for f in os.listdir(dir_models) if '.pkl' in f]
+    print(f"\nLoading {len(pkl_files)} models...")
+    features_models = {}
+    for f in pkl_files:
+        pkl_path = os.path.join(dir_models, f)
+        model = load_pickle_object_as_data(pkl_path)
+        features_models[f.replace('.pkl', '')] = model
+    print('  DONE')
+    return features_models
+
+
+def load_pickle_object_as_data(file_path):
+    """
+    Purpose:
+        Load data from pkl file
+    Inputs:
+        file_path
+            type: str
+            meaning: path to pkl file
+    Outputs:
+        data
+            type: pkl
+            meaning: pkl data loaded
+    """
+    with open(file_path, 'rb') as f_handle:
+        data = pickle.load(f_handle)
+    return data
