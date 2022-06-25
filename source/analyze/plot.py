@@ -28,11 +28,15 @@ def boxplot_rankscores(algs_rspaths, dir_out, desired_order_list = ['dtw', 'edr'
 
 """ TEST """
 if __name__ == '__main__':
+    hz = 10
+    tests = [1, 2, 3]
+    feats = ['xs', 'ys', 'zs', 'dists']
     algs_rspaths = {
-        'lstm': "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
-        'dtw': "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
-        'edr': "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+        'lstm-batch': f"/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/training=batch/HZ={hz};TESTS={tests};FEATURES={feats}/rankscores.csv",
+        'lstm-online-window=1': f"/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/training=online/window=1/HZ={hz};TESTS={tests};FEATURES={feats}/rankscores.csv",
+        'lstm-online-window=10': f"/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/training=online/window=10/HZ={hz};TESTS={tests};FEATURES={feats}/rankscores.csv",
+        'lstm-online-window=100': f"/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/training=online/window=100/HZ={hz};TESTS={tests};FEATURES={feats}/rankscores.csv",
+        'lstm-online-window=1000': f"/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/training=online/window=1000/HZ={hz};TESTS={tests};FEATURES={feats}/rankscores.csv",
     }
     dir_out = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
-    # histplot_rankscores(algs_rspaths, dir_out)
     boxplot_rankscores(algs_rspaths, dir_out)

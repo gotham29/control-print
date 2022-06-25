@@ -1,3 +1,4 @@
+import numpy as np
 import os
 import sys
 
@@ -12,11 +13,25 @@ from source.model.htm import train_htm
 from numpy import array
 
 
+def get_preds_online(X, model, n_steps=1):
+    preds = []
+    N = X.shape[2]
+    for _ in range(X.shape[0]):
+        x = X[_].reshape(-1, n_steps, N)
+        y_hat = np.round_(model.predict_on_batch(x)) # predict on the "new" input
+        preds.append(y_hat)
+    return array(preds)
+
+
 def train_save_models(subjects_traintest, config):
     if config['alg'] == 'lstm':
-        subjects_models = train_lstm(subjects_traintest, config['features'], config['data_cap'],
-                                     config['dirs']['output_models'], n_steps=1,
+        subjects_models = train_lstm(subjects_traintest=subjects_traintest,
+                                     window_size=config['window_size'],
+                                     features=config['features'],
+                                     data_cap=config['data_cap'],
+                                     dir_models=config['dirs']['output_models'],
                                      n_epochs=config['lstm_n_epochs'])
+
     elif config['alg'] == 'htm':
         subjects_models = train_htm(subjects_traintest, config, config['dirs']['htm_config'])
 
@@ -27,15 +42,19 @@ def train_save_models(subjects_traintest, config):
     return subjects_models
 
 
-def get_models_preds(subjects_traintest, subjects_models, features):
+def get_models_preds(subjects_traintest, subjects_models, test_mode, window_size, features, n_steps=1):
     subjstest_subjspreds = {}
     for subjtest, traintest in subjects_traintest.items():
         subjstest_subjspreds[subjtest] = {}
         X_array = array(traintest['test'][features])
         X_array = X_array[:len(X_array) - 1]
-        X = X_array.reshape((X_array.shape[0], 1, X_array.shape[1]))
+        X = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1])) #1-->window_size
         for subjmod, mod in subjects_models.items():
-            subjstest_subjspreds[subjtest][subjmod] = mod.predict(X)
+            if test_mode == 'batch':
+                subjstest_subjspreds[subjtest][subjmod] = mod.predict(X)
+            else:
+                subjstest_subjspreds[subjtest][subjmod] = get_preds_online(X, mod)
+
     return subjstest_subjspreds
 
 
@@ -52,15 +71,27 @@ def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
     return subjstest_subjsdists
 
 
-def get_models_dists_dist(subjects_traintest, alg, features):
+def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_mode):
     subjstest_subjsdists = {}
     for subjtest1, traintest in subjects_traintest.items():
         subjstest_subjsdists[subjtest1] = {}
         data1 = traintest['train'][features]
         for subjtest2, traintest in subjects_traintest.items():
             data2 = traintest['test'][features]
-            subjstest_subjsdists[subjtest1][subjtest2] = get_dist(data1, data2, alg)
+            if test_mode == 'batch':
+                subjstest_subjsdists[subjtest1][subjtest2] = get_dist(data1, data2, alg)
+            else:
+                subjstest_subjsdists[subjtest1][subjtest2] = get_dist_online(data1, data2, window_size, alg)
+
     return subjstest_subjsdists
+
+
+def get_dist_online(data1, data2, window_size, alg):
+    dist = 0
+    for _, row2 in data2.iterrows():
+        data2 = np.reshape(row2.values, (-1, len(row2)))
+        dist += get_dist(data1[-window_size:].values, data2, alg)
+    return dist
 
 
 def get_dist(data1, data2, alg):

@@ -66,7 +66,6 @@ def preprocess(dir_input, dir_output, test_indices, hz, colinds_colnames):
         path_test = os.path.join(dir_output, f"subj={subj}_test.csv")
         traintest['train'].to_csv(path_train, index=False)
         traintest['test'].to_csv(path_test, index=False)
-    print('  DONE')
 
     return subjects_traintest
 

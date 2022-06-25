@@ -1,8 +1,11 @@
-alg: htm #lstm #htm, dtw, edr
-train_models: true
-data_cap: 1000
+alg: edr #lstm #htm, dtw, edr
+test_mode: online #batch, online
+train_models: false #true, false
 hz: 5
+window_size: 1
+
 lstm_n_epochs: 100
+data_cap: 1000000
 test_indices:
   - 1
   - 2

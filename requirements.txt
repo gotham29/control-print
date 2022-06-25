@@ -5,7 +5,7 @@ pandas
 numpy
 pandas
 pickle5
-dtw-python
+fastdtw
 editdistance
 keras
 tensorflow

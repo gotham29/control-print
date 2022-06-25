@@ -63,8 +63,10 @@ def validate_config(config):
     keys_dtypes = {
         'alg': str,
         'lstm_n_epochs': int,
+        'test_mode': str,
         'data_cap': int,
         'hz': int,
+        'window_size': int,
         'test_indices': list,
         'features': list,
         'train_models': bool,
@@ -92,19 +94,33 @@ def validate_config(config):
         if dir_type not in ['output_models', 'output_results']:
             assert os.path.exists(dir), f"{dir_type} not found! --> {dir}"
         else:
-            # make sub-folders for models & results (but no models for distance algs)
+            # make sub-folders for models & results (but skip for distance algs since no models learned)
             if dir_type == 'output_models' and config['algs_types'][config['alg']] == 'distance':
                 continue
-            dir_alg = os.path.join(dir, config['alg'])
+            # make alg dir
+            dir_alg = os.path.join(dir, f"{config['alg']}")
             make_dir(dir_alg)
+            # make sub-dir for test_model (for results, models not needed since always batch trained)
+            if dir_type == 'output_results':
+                dir_alg = os.path.join(dir_alg, f"testing={config['test_mode']}")
+                make_dir(dir_alg)
+            # make sub-sub-dir for hz-test_indices-features combo
             subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']}"
-            dir_sub = os.path.join(dir, config['alg'], subfolder)
+            dir_sub = os.path.join(dir_alg, subfolder)
             make_dir(dir_sub)
+            # make sub-sub-sub-dir for window_size IF online test_mode
+            if dir_type == 'output_results' and config['test_mode'] == 'online':
+                dir_sub = os.path.join(dir_sub, f"window={config['window_size']}")
+                make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
 
     # Ensure alg is valid
     algs_valid = ['lstm', 'htm', 'dtw', 'edr']
     assert config['alg'] in algs_valid, f"alg should be one of --> {algs_valid}; found --> {config['alg']}"
+
+    # Ensure test_mode is valid
+    modes_valid = ['batch', 'online']
+    assert config['test_mode'] in modes_valid, f"test_mode should be one of --> {modes_valid}; found --> {config['test_mode']}"
 
     # Ensure alg_types is valid
     types_valid = ['prediction', 'anomaly', 'distance']
@@ -117,6 +133,9 @@ def validate_config(config):
 
     # Ensure 1 <= hz <= 100
     assert 1 <= config['hz'] <= 100, f"  hz expected 1 - 100 found --> {config['hz']}"
+
+    # Ensure 1 <= window_size <= 10000
+    assert 1 <= config['window_size'] <= 10000, f"  window_size expected 1 - 10000 found --> {config['window_size']}"
 
     # Ensure 100 <= lstm_n_epochs <= 500
     assert 100 <= config[
@@ -144,11 +163,12 @@ def validate_config(config):
 
     print(f"  alg = {config['alg']}")
     print(f"  train_models = {config['train_models']}")
+    print(f"  test_mode = {config['test_mode']}")
+    print(f"  window_size = {config['window_size']}")
     print(f"  hz = {config['hz']}")
     print(f"  data_cap = {config['data_cap']}")
     print(f"  features = {config['features']}")
     print(f"  test_indices = {config['test_indices']}")
-    print('  DONE')
 
 
 def load_models(dir_models):

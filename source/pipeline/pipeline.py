@@ -35,15 +35,13 @@ def run_pipeline(config):
         print('\nGetting all model preds on all subjs test...')
         subjstest_subjspreds = get_models_preds(subjects_traintest=subjects_traintest,
                                                 subjects_models=subjects_models,
+                                                test_mode=config['test_mode'],
+                                                window_size=config['window_size'],
                                                 features=config['features'])
-        print('  DONE')
-
         print('\nGetting all models dists from all subjs test...')
         subjstest_subjsdists = get_models_dists_pred(subjstest_subjspreds=subjstest_subjspreds,
                                                      subjects_traintest=subjects_traintest,
                                                      features=config['features'])
-        print('  DONE')
-
     # elif alg_type == 'anomaly':
     #     subjstest_subjsanoms = get_models_anomscores(subjects_traintest,
     #                                                  subjects_models,
@@ -52,9 +50,12 @@ def run_pipeline(config):
     #                                                  config['features'])
     #
     else:  # alg_type == 'distance'
+        print('\nGetting all models dists from all subjs test...')
         subjstest_subjsdists = get_models_dists_dist(subjects_traintest,
                                                      config['alg'],
-                                                     config['features'])
+                                                     config['window_size'],
+                                                     config['features'],
+                                                     config['test_mode'],)
 
     # GET RANK SCORES
     print('\nGetting and saving all subjs rank scores...')
