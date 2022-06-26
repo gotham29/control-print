@@ -9,4 +9,5 @@ fastdtw
 editdistance
 keras
 tensorflow
+matplotlib
 
