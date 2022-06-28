@@ -48,7 +48,7 @@ def get_models_preds(subjects_traintest, subjects_models, test_mode, window_size
         subjstest_subjspreds[subjtest] = {}
         X_array = array(traintest['test'][features])
         X_array = X_array[:len(X_array) - 1]
-        X = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1])) #1-->window_size
+        X = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1]))
         for subjmod, mod in subjects_models.items():
             if test_mode == 'batch':
                 subjstest_subjspreds[subjtest][subjmod] = mod.predict(X)
@@ -75,13 +75,25 @@ def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features, te
         y_true = array(subjects_traintest[subjtest]['test'][features].shift(-1))
         # Drop last row (since its NaN after shift)
         y_true = y_true[:len(y_true) - 1]
-        # Transform data if Online mode
-        if test_mode == 'online':
-            y_true = get_windowed_data(y_true, window_size)
         # Calc dist
         for subjpred, preds in subjspreds.items():
-            subjstest_subjsdists[subjtest][subjpred] = abs(y_true - preds).sum()
+            if test_mode == 'batch':
+                subjstest_subjsdists[subjtest][subjpred] = get_diff(y_true, preds)
+            else:
+                subjstest_subjsdists[subjtest][subjpred] = get_diff_online(y_true, preds, window_size)
     return subjstest_subjsdists
+
+
+def get_diff_online(y_true, preds, window_size):
+    y_true = get_windowed_data(y_true, window_size)
+    dist = 0
+    for _ in range(len(y_true)):
+        dist += get_diff(y_true[_], preds[_])
+    return dist
+
+
+def get_diff(y_true, preds):
+    return abs(y_true - preds).sum()
 
 
 def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_mode):
