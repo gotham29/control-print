@@ -1,8 +1,8 @@
-alg: lstm #lstm #htm, dtw, edr
+alg: dtw #lstm #htm, dtw, edr
 test_mode: online #batch, online
 train_models: false #true, false
-hz: 1
-window_size: 10
+hz: 3
+window_size: 1
 
 lstm_n_epochs: 100
 data_cap: 1000000

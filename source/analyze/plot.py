@@ -62,10 +62,10 @@ if __name__ == '__main__':
                         ],
         'DTW-online-1hz-1window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
-        ],
+                        ],
         'DTW-online-1hz-10window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
-        ],
+                        ],
         'DTW-batch-3hz': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv"
                         ],
@@ -89,10 +89,10 @@ if __name__ == '__main__':
                         ],
         'EDR-online-1hz-1window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
-        ],
+                        ],
         'EDR-online-1hz-10window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
-        ],
+                        ],
         'EDR-batch-3hz': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
@@ -116,10 +116,10 @@ if __name__ == '__main__':
                         ],
         'LSTM-online-1hz-1window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
-        ],
+                        ],
         'LSTM-online-1hz-10window': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
-        ],
+                        ],
         'LSTM-batch-3hz': [
             "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
     substrs_req = [
         '1hz',
-        # 'LSTM',
+        'LSTM',
         # 'online',
                    ]
     dir_out = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
