@@ -1,8 +1,7 @@
-import os
-from os.path import isfile, join
-
 import numpy as np
+import os
 import pandas as pd
+from os.path import isfile, join
 
 
 def get_dists(row):
