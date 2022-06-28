@@ -13,12 +13,12 @@ from source.model.htm import train_htm
 from numpy import array
 
 
-def get_preds_online(X, model, n_steps=1):
+def get_preds_online(X, model, window_size, n_steps=1):
     preds = []
-    N = X.shape[2]
-    for _ in range(X.shape[0]):
-        x = X[_].reshape(-1, n_steps, N)
-        y_hat = np.round_(model.predict_on_batch(x)) # predict on the "new" input
+    for _ in range(1, len(X)+1):
+        window_adj = min(_, window_size)
+        x = X[_-window_adj:_]
+        y_hat = np.round_(model.predict_on_batch(x))  # predict on the "new" input
         preds.append(y_hat)
     return array(preds)
 
@@ -53,12 +53,21 @@ def get_models_preds(subjects_traintest, subjects_models, test_mode, window_size
             if test_mode == 'batch':
                 subjstest_subjspreds[subjtest][subjmod] = mod.predict(X)
             else:
-                subjstest_subjspreds[subjtest][subjmod] = get_preds_online(X, mod)
+                subjstest_subjspreds[subjtest][subjmod] = get_preds_online(X, mod, window_size)
 
     return subjstest_subjspreds
 
 
-def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
+def get_windowed_data(data, window_size):
+    rows = []
+    for _ in range(1, len(data)+1):
+        window_adj = min(_, window_size)
+        d = data[_-window_adj:_]
+        rows.append(d)
+    return array(rows)
+
+
+def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features, test_mode, window_size):
     subjstest_subjsdists = {}
     for subjtest, subjspreds in subjstest_subjspreds.items():
         subjstest_subjsdists[subjtest] = {}
@@ -66,6 +75,10 @@ def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
         y_true = array(subjects_traintest[subjtest]['test'][features].shift(-1))
         # Drop last row (since its NaN after shift)
         y_true = y_true[:len(y_true) - 1]
+        # Transform data if Online mode
+        if test_mode == 'online':
+            y_true = get_windowed_data(y_true, window_size)
+        # Calc dist
         for subjpred, preds in subjspreds.items():
             subjstest_subjsdists[subjtest][subjpred] = abs(y_true - preds).sum()
     return subjstest_subjsdists
@@ -88,9 +101,10 @@ def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_m
 
 def get_dist_online(data1, data2, window_size, alg):
     dist = 0
-    for _, row2 in data2.iterrows():
-        data2 = np.reshape(row2.values, (-1, len(row2)))
-        dist += get_dist(data1[-window_size:].values, data2, alg)
+    for _ in range(1, len(data2)+1):
+        window_adj = min(_, window_size)
+        data2_ = data2[_-window_adj:_]
+        dist += get_dist(data1, data2_, alg)
     return dist
 
 
@@ -98,7 +112,7 @@ def get_dist(data1, data2, alg):
     algs_valid = ['dtw', 'edr']
     assert alg in algs_valid, f"Expected distance-based alg in -- {algs_valid}; found --> {alg}"
     if alg == 'dtw':
-        dist = get_dtw_dist(data1, data2)
+        dist = get_dtw_dist(data1.values, data2.values)
     else:  # alg = 'edr'
         dist = get_edr_dist(data1, data2)
     return dist

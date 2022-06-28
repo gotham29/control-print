@@ -41,7 +41,9 @@ def run_pipeline(config):
         print('\nGetting all models dists from all subjs test...')
         subjstest_subjsdists = get_models_dists_pred(subjstest_subjspreds=subjstest_subjspreds,
                                                      subjects_traintest=subjects_traintest,
-                                                     features=config['features'])
+                                                     features=config['features'],
+                                                     test_mode=config['test_mode'],
+                                                     window_size=config['window_size'])
     # elif alg_type == 'anomaly':
     #     subjstest_subjsanoms = get_models_anomscores(subjects_traintest,
     #                                                  subjects_models,
