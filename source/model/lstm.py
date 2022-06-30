@@ -78,6 +78,5 @@ def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, 
         time_elapsed_mins = round((time.time() - time_start) / 60, 2)
         print(f"  Trained {counter} of {len(subjects_traintest)} models; elapsed minutes = {time_elapsed_mins}")
         counter += 1
-    print('  DONE')
 
     return subjects_models

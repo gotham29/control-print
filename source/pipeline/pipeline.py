@@ -6,7 +6,8 @@ sys.path.append(_SOURCE_DIR)
 
 from source.preprocess.preprocess import preprocess
 from source.analyze.rank_score import write_rankscores
-from source.model.model import train_save_models, get_models_preds, get_models_dists_pred, get_models_dists_dist
+from source.model.model import train_save_models, get_models_preds, get_models_dists_pred, get_models_dists_dist, \
+    get_models_anomscores
 from source.utils.utils import load_config, load_models, validate_config, get_args
 
 
@@ -44,23 +45,23 @@ def run_pipeline(config):
                                                      features=config['features'],
                                                      test_mode=config['test_mode'],
                                                      window_size=config['window_size'])
-    # elif alg_type == 'anomaly':
-    #     subjstest_subjsanoms = get_models_anomscores(subjects_traintest,
-    #                                                  subjects_models,
-    #                                                  config['features'])
-    #     subjstest_subjsdists = get_models_dists_anom(subjstest_subjsanoms,
-    #                                                  config['features'])
-    #
+    elif alg_type == 'anomaly':
+        subjstest_subjsdists = get_models_anomscores(subjects_traintest,
+                                                     subjects_models,
+                                                     config['features'])
     else:  # alg_type == 'distance'
         print('\nGetting all models dists from all subjs test...')
         subjstest_subjsdists = get_models_dists_dist(subjects_traintest,
                                                      config['alg'],
                                                      config['window_size'],
                                                      config['features'],
-                                                     config['test_mode'],)
+                                                     config['test_mode'], )
 
     # GET RANK SCORES
     print('\nGetting and saving all subjs rank scores...')
+    label = f"alg={config['alg']}--hz={config['hz']}"
+    if config['alg'] != 'htm':
+        label += f"--window={config['window_size']}--mode={config['test_mode']}"
     write_rankscores(subjstest_subjsdists=subjstest_subjsdists,
                      dir_output=config['dirs']['output_results'])
     print('  DONE')

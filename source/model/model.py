@@ -8,7 +8,7 @@ sys.path.append(_SOURCE_DIR)
 from source.model.lstm import train_lstm
 from source.model.dtw import get_dtw_dist
 from source.model.edr import get_edr_dist
-from source.model.htm import train_htm
+from source.model.htm import train_htm, get_htm_dist
 
 from numpy import array
 
@@ -128,3 +128,12 @@ def get_dist(data1, data2, alg):
     else:  # alg = 'edr'
         dist = get_edr_dist(data1, data2)
     return dist
+
+
+def get_models_anomscores(subjects_traintest, subjects_models, features):
+    subjstest_subjsanoms = {}
+    for subjtest1, mod_dict in subjects_models.items():
+        subjstest_subjsanoms[subjtest1] = {}
+        for subjtest2, traintest in subjects_traintest.items():
+            subjstest_subjsanoms[subjtest1][subjtest2] = get_htm_dist(mod_dict, traintest['test'])
+    return subjstest_subjsanoms

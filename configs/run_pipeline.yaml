@@ -1,7 +1,7 @@
-alg: dtw #lstm #htm, dtw, edr
+alg: lstm #lstm #htm, dtw, edr
 test_mode: online #batch, online
-train_models: false #true, false
-hz: 3
+train_models: true #true, false
+hz: 100
 window_size: 1
 
 lstm_n_epochs: 100
@@ -29,7 +29,7 @@ colinds_features:
   '0.10': dists_z
   '0': dists
 dirs:
-  htm_src: /Users/samheiserman/Desktop/repos/htm_streamer
+#  htm_src: /Users/samheiserman/Desktop/repos/htm_streamer
   htm_config: /Users/samheiserman/Desktop/PhD/Motion-Print/configs/htm.yaml
   input: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_raw
   output_data: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_preprocessed

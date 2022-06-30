@@ -108,8 +108,8 @@ def validate_config(config):
             subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']}"
             dir_sub = os.path.join(dir_alg, subfolder)
             make_dir(dir_sub)
-            # make sub-sub-sub-dir for window_size IF online test_mode
-            if dir_type == 'output_results' and config['test_mode'] == 'online':
+            # make sub-sub-sub-dir for window_size IF online test_mode AND not HTM
+            if dir_type == 'output_results' and config['test_mode'] == 'online' and config['alg'] != 'htm':
                 dir_sub = os.path.join(dir_sub, f"window={config['window_size']}")
                 make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
