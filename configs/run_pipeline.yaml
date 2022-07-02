@@ -1,20 +1,23 @@
 alg: lstm #lstm #htm, dtw, edr
 test_mode: online #batch, online
 train_models: true #true, false
-hz: 100
-window_size: 1
+hz: 5
+window_size: 10
 
-lstm_n_epochs: 100
+#lstm_n_epochs: 100
 data_cap: 1000000
 test_indices:
   - 1
   - 2
   - 3
 features:
-  - xs
+#  - xs
   - ys
   - zs
   - dists
+#  - dists_x
+#  - dists_y
+#  - dists_z
 algs_types:
   lstm: prediction
   htm: anomaly
@@ -29,9 +32,54 @@ colinds_features:
   '0.10': dists_z
   '0': dists
 dirs:
-#  htm_src: /Users/samheiserman/Desktop/repos/htm_streamer
-  htm_config: /Users/samheiserman/Desktop/PhD/Motion-Print/configs/htm.yaml
   input: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_raw
   output_data: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_preprocessed
   output_models: /Users/samheiserman/Desktop/PhD/Motion-Print/output/models
   output_results: /Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores
+
+lstm_config:
+  n_epochs: 100
+  n_layers: 2
+  n_units: 100
+  activation: relu
+  optimizer: adam
+  loss: mse
+
+htm_config:
+  features:
+    - ys
+    - zs
+    - dists
+  models_params:
+    anomaly:
+      period: 1000
+    predictor:
+      sdrc_alpha: 0.1
+    sp:
+      boostStrength: 0.0
+      columnCount: 2048
+      localAreaDensity: 0.04395604395604396
+      potentialPct: 0.8
+      synPermActiveInc: 0.003
+      synPermConnected: 0.2
+      synPermInactiveDec: 0.0005
+    tm:
+      activationThreshold: 13
+      cellsPerColumn: 32
+      initialPerm: 0.21
+      maxSegmentsPerCell: 128
+      maxSynapsesPerSegment: 32
+      minThreshold: 10
+      newSynapseCount: 20
+      permanenceConnected: 0.3
+      permanenceDec: 0.1
+      permanenceInc: 0.1
+  models_state:
+    model_for_each_feature: false
+    save_outputs_accumulated: true
+    track_iter: 10
+    track_tm: false
+  timesteps_stop:
+    learning: 100000
+    running: 110000
+    sampling: 30

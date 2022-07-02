@@ -62,7 +62,6 @@ def validate_config(config):
     # Ensure expected keys present and correct type
     keys_dtypes = {
         'alg': str,
-        'lstm_n_epochs': int,
         'test_mode': str,
         'data_cap': int,
         'hz': int,
@@ -139,7 +138,27 @@ def validate_config(config):
 
     # Ensure 100 <= lstm_n_epochs <= 500
     assert 100 <= config[
-        'lstm_n_epochs'] < 500, f"  lstm_n_epochs expected 100 - 500 found --> {config['lstm_n_epochs']}"
+        'lstm_config']['n_epochs'] < 500, f"  lstm 'n_epochs' expected 100 - 500 found --> {config['lstm_config']['n_epochs']}"
+
+    # Ensure 1 <= lstm_n_layers <= 5
+    assert 1 <= config[
+        'lstm_config']['n_layers'] < 5, f"  lstm 'n_layers' expected 1 - 5 found --> {config['lstm_config']['n_layers']}"
+
+    # Ensure 2 <= n_units <= 200
+    assert 2 <= config[
+        'lstm_config']['n_units'] < 200, f"  lstm 'n_units' expected 2 - 200 found --> {config['lstm_config']['n_units']}"
+
+    # Ensure lstm 'activation' valid
+    valid_activations = ['relu']
+    assert config['lstm_config']['activation'] in valid_activations
+
+    # Ensure lstm 'optimizer' valid
+    valid_optimizers = ['adam']
+    assert config['lstm_config']['optimizer'] in valid_optimizers
+
+    # Ensure lstm 'loss' valid
+    valid_losses = ['mse']
+    assert config['lstm_config']['loss'] in valid_losses
 
     # Ensure test_indicies range from 1 - 15
     non_ints = []

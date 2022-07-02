@@ -30,10 +30,11 @@ def train_save_models(subjects_traintest, config):
                                      features=config['features'],
                                      data_cap=config['data_cap'],
                                      dir_models=config['dirs']['output_models'],
-                                     n_epochs=config['lstm_n_epochs'])
+                                     config_lstm=config['lstm_config'])
+                                     # n_epochs=config['lstm_n_epochs'],)
 
     elif config['alg'] == 'htm':
-        subjects_models = train_htm(subjects_traintest, config, config['dirs']['htm_config'])
+        subjects_models = train_htm(subjects_traintest, config)  #config['dirs']['htm_config']
 
     else:
         raise ValueError("train_models called with alg neither lstm or htm, found --> {alg}")

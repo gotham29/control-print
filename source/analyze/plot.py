@@ -48,8 +48,12 @@ def boxplot_rankscores(algs_rspaths, dir_out, label=None, title=None):
     for alg, rspathlist in algs_rspaths.items():
         rss = []
         for rspath in rspathlist:
-            rss += list(pd.read_csv(rspath)['RankScores'].values)
-        algs_rs[alg] = rss
+            try:
+                rss += list(pd.read_csv(rspath)['RankScores'].values)
+            except:
+                print(f"  FILE NOT FOUND\n    --> {rspath}")
+        if len(rss) > 0:
+            algs_rs[alg] = rss
     ax.boxplot(algs_rs.values())
     ax.set_xticklabels(algs_rs.keys(), rotation=90)
     ax.yaxis.grid(True)
@@ -65,132 +69,145 @@ def boxplot_rankscores(algs_rspaths, dir_out, label=None, title=None):
 
 """ TEST """
 if __name__ == '__main__':
+    dir_rankscores = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
     algs_rspaths = {
         'DTW-batch-1hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'DTW-online-1hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'DTW-online-1hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'DTW-batch-3hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv"
+            f"{dir_rankscores}/dtw/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv"
                         ],
         'DTW-online-3hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'DTW-online-3hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'DTW-batch-5hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'DTW-batch-10hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'DTW-batch-20hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'DTW-batch-50hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'DTW-batch-100hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-batch-1hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-online-1hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'EDR-online-1hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'EDR-batch-3hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-online-3hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'EDR-online-3hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'EDR-batch-5hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-batch-10hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-batch-20hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-batch-50hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'EDR-batch-100hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/edr/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/edr/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+                        ],
+        'HTM-online-3hz': [
+            f"{dir_rankscores}/htm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv",  #'xs',
+        ],
+        'HTM-online-5hz': [
+            f"{dir_rankscores}/htm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv", #'xs',
                         ],
         'HTM-online-10hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/htm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/htm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv",  #'xs',
+                        ],
+        'HTM-online-100hz': [
+            f"{dir_rankscores}/htm/testing=online/HZ=100;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv",  #'xs',
                         ],
         'LSTM-batch-1hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-online-1hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'LSTM-online-1hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/dtw/testing=online/HZ=1;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'LSTM-batch-3hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-online-3hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'LSTM-online-3hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'LSTM-batch-5hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-online-5hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'LSTM-online-5hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'LSTM-batch-10hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-online-10hz-1window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'LSTM-online-10hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
+                        ],
+        'LSTM-online-100hz-1window': [
+            f"{dir_rankscores}/lstm/testing=online/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=1/rankscores.csv",
                         ],
         'LSTM-online-100hz-10window': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=online/HZ=10;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=100/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=online/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/window=10/rankscores.csv",
                         ],
         'LSTM-batch-20hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=20;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-batch-50hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=50;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
         'LSTM-batch-100hz': [
-            "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores/lstm/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
+            f"{dir_rankscores}/lstm/testing=batch/HZ=100;TESTS=[1, 2, 3];FEATURES=['xs', 'ys', 'zs', 'dists']/rankscores.csv",
                         ],
     }
 
 
     features_chosen = {
-        'algs': ['LSTM', 'HTM'],  #, 'HTM'
-        'hzs': ['10hz', '5hz', '3hz', '1hz'],
-        'modes': ['online'],  #,'batch',
-        'windows': ['1window', '10window']
+        'algs': ['LSTM', 'HTM', 'DTW', 'EDR'],  #, 'HTM'
+        'hzs': ['100hz', '10hz', '5hz', '3hz'],  #, '100hz', '1hz'
+        'modes': ['online'],  #'batch', 'online'
+        'windows': ['1window']  #, '1window',
     }
 
     dir_out = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
@@ -199,7 +216,7 @@ if __name__ == '__main__':
         out = f"{feat}={','.join(chosen)}--"
         out_label += out
 
-    out_title = "RankScores -- Mode=Batch; Tests=1,2,3"
+    out_title = "RankScores"
     algs_rspaths_filtered = get_algs_rspaths_filtered(algs_rspaths, features_chosen)
     print("algs_rspaths_filtered...")
     for algcombo, rspathslist in algs_rspaths_filtered.items():

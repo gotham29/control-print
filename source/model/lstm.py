@@ -12,8 +12,8 @@ sys.path.append(_SOURCE_DIR)
 from source.utils.utils import make_dir, save_data_as_pickle
 
 
-def train_lstm_batch(X, y_array, data_cap, n_epochs, model):
-    model.fit(X[:data_cap], y_array[:data_cap], epochs=n_epochs, verbose=0)
+def train_lstm_batch(X, y_array, data_cap, config_lstm, model):
+    model.fit(X[:data_cap], y_array[:data_cap], epochs=config_lstm['n_epochs'], verbose=0)
     return model
 
 
@@ -26,18 +26,28 @@ def train_lstm_batch(X, y_array, data_cap, n_epochs, model):
 #     return model
 
 
-def compile_lstm(n_units, n_steps, n_features):
+def compile_lstm(lstm_config, n_steps, n_features):
+    # lstm_config = {'n_layers': 2, 'n_units': n_units, 'activation': 'relu', 'optimizer': 'adam', 'loss': 'mse'}
+    # model = Sequential()
+    # model.add(LSTM(n_units, activation='relu', return_sequences=True, input_shape=(n_steps, n_features)))
+    # model.add(LSTM(n_units, activation='relu'))
+    # model.add(Dense(n_features))
     model = Sequential()
-    model.add(LSTM(n_units, activation='relu', return_sequences=True, input_shape=(n_steps, n_features)))
-    model.add(LSTM(n_units, activation='relu'))
+    for layer_i in range(lstm_config['n_layers']):
+        if layer_i == 0:
+            model.add(LSTM(units=lstm_config['n_units'],
+                           activation=lstm_config['activation'],
+                           return_sequences=True,
+                           input_shape=(n_steps, n_features)))
+        else:
+            model.add(LSTM(units=lstm_config['n_units'],
+                           activation=lstm_config['activation']))
     model.add(Dense(n_features))
-    # layers = [LSTM(2), Dense(n_features)]
-    # model = Sequential(layers)
-    model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer=lstm_config['optimizer'], loss=lstm_config['loss'])
     return model
 
 
-def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, n_steps=1, n_epochs=100):
+def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, config_lstm, n_steps=1):  #n_epochs=100
     """ TODO --> Validate LSTM implementation """
 
     print(f"\nTraining {len(subjects_traintest)} LSTM models...")
@@ -60,10 +70,10 @@ def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, 
         """ SCALE DATA (?) """
 
         # build & compile model
-        model = compile_lstm(100, n_steps, n_features)
+        model = compile_lstm(config_lstm, n_steps, n_features)
 
         # fit model -- CAN TRAIN IN BATCH BUT TEST IN ONLINE
-        model = train_lstm_batch(X, y_array, data_cap, n_epochs, model)
+        model = train_lstm_batch(X, y_array, data_cap, config_lstm, model)
         # if train_mode == 'batch':
         #     model = train_lstm_batch(X, y_array, data_cap, n_epochs, model)
         # else:
