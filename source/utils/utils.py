@@ -119,7 +119,8 @@ def validate_config(config):
 
     # Ensure test_mode is valid
     modes_valid = ['batch', 'online']
-    assert config['test_mode'] in modes_valid, f"test_mode should be one of --> {modes_valid}; found --> {config['test_mode']}"
+    assert config[
+               'test_mode'] in modes_valid, f"test_mode should be one of --> {modes_valid}; found --> {config['test_mode']}"
 
     # Ensure alg_types is valid
     types_valid = ['prediction', 'anomaly', 'distance']
@@ -138,27 +139,33 @@ def validate_config(config):
 
     # Ensure 100 <= lstm_n_epochs <= 500
     assert 100 <= config[
-        'lstm_config']['n_epochs'] < 500, f"  lstm 'n_epochs' expected 100 - 500 found --> {config['lstm_config']['n_epochs']}"
+        'lstm_config'][
+        'n_epochs'] < 500, f"  lstm 'n_epochs' expected 100 - 500 found --> {config['lstm_config']['n_epochs']}"
 
     # Ensure 1 <= lstm_n_layers <= 5
     assert 1 <= config[
-        'lstm_config']['n_layers'] < 5, f"  lstm 'n_layers' expected 1 - 5 found --> {config['lstm_config']['n_layers']}"
+        'lstm_config'][
+        'n_layers'] < 5, f"  lstm 'n_layers' expected 1 - 5 found --> {config['lstm_config']['n_layers']}"
 
     # Ensure 2 <= n_units <= 200
     assert 2 <= config[
-        'lstm_config']['n_units'] < 200, f"  lstm 'n_units' expected 2 - 200 found --> {config['lstm_config']['n_units']}"
+        'lstm_config'][
+        'n_units'] < 200, f"  lstm 'n_units' expected 2 - 200 found --> {config['lstm_config']['n_units']}"
 
     # Ensure lstm 'activation' valid
     valid_activations = ['relu']
-    assert config['lstm_config']['activation'] in valid_activations
+    assert config['lstm_config'][
+               'activation'] in valid_activations, f"Invalid activation found --> {config['lstm_config']['activation']}\n  valids --> {valid_activations}"
 
     # Ensure lstm 'optimizer' valid
     valid_optimizers = ['adam']
-    assert config['lstm_config']['optimizer'] in valid_optimizers
+    assert config['lstm_config'][
+               'optimizer'] in valid_optimizers, f"Invalid optimizer found --> {config['lstm_config']['optimizer']}\n  valids --> {valid_optimizers}"
 
     # Ensure lstm 'loss' valid
     valid_losses = ['mse']
-    assert config['lstm_config']['loss'] in valid_losses
+    assert config['lstm_config'][
+               'loss'] in valid_losses, f"Invalid loss found --> {config['lstm_config']['loss']}\n  valids --> {valid_losses}"
 
     # Ensure test_indicies range from 1 - 15
     non_ints = []

@@ -51,7 +51,7 @@ def boxplot_rankscores(algs_rspaths, dir_out, label=None, title=None):
             try:
                 rss += list(pd.read_csv(rspath)['RankScores'].values)
             except:
-                print(f"  FILE NOT FOUND\n    --> {rspath}")
+                print(f"\n  FILE NOT FOUND\n    --> {rspath}")
         if len(rss) > 0:
             algs_rs[alg] = rss
     ax.boxplot(algs_rs.values())
@@ -139,7 +139,7 @@ if __name__ == '__main__':
                         ],
         'HTM-online-3hz': [
             f"{dir_rankscores}/htm/testing=online/HZ=3;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv",  #'xs',
-        ],
+                        ],
         'HTM-online-5hz': [
             f"{dir_rankscores}/htm/testing=online/HZ=5;TESTS=[1, 2, 3];FEATURES=['ys', 'zs', 'dists']/rankscores.csv", #'xs',
                         ],
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     features_chosen = {
         'algs': ['LSTM', 'HTM', 'DTW', 'EDR'],  #, 'HTM'
-        'hzs': ['100hz', '10hz', '5hz', '3hz'],  #, '100hz', '1hz'
+        'hzs': ['100hz', '50hz', '20hz', '10hz', '5hz', '3hz'],  #, '100hz', '1hz'
         'modes': ['online'],  #'batch', 'online'
         'windows': ['1window']  #, '1window',
     }
