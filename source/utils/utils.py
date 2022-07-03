@@ -18,6 +18,17 @@ def make_dir(mydir):
         os.mkdir(mydir)
 
 
+def get_dirfiles(dir_root, files_types=None):
+    subfiles = []
+    for path, subdirs, files in os.walk(dir_root):
+        for name in files:
+            subfiles.append(os.path.join(path, name))
+    if files_types is not None:
+        assert isinstance(files_types, list), f"files_types should be a list, found --> {type(files_types)}"
+        subfiles = [s for s in subfiles if s.split('.')[-1] in files_types]
+    return subfiles
+
+
 def load_config(yaml_path):
     """
     Purpose:
@@ -97,11 +108,11 @@ def validate_config(config):
             if dir_type == 'output_models' and config['algs_types'][config['alg']] == 'distance':
                 continue
             # make alg dir
-            dir_alg = os.path.join(dir, f"{config['alg']}")
+            dir_alg = os.path.join(dir, f"ALG={config['alg']}")
             make_dir(dir_alg)
             # make sub-dir for test_model (for results, models not needed since always batch trained)
             if dir_type == 'output_results':
-                dir_alg = os.path.join(dir_alg, f"testing={config['test_mode']}")
+                dir_alg = os.path.join(dir_alg, f"TESTMODE={config['test_mode']}")
                 make_dir(dir_alg)
             # make sub-sub-dir for hz-test_indices-features combo
             subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']}"
@@ -109,7 +120,7 @@ def validate_config(config):
             make_dir(dir_sub)
             # make sub-sub-sub-dir for window_size IF online test_mode AND not HTM
             if dir_type == 'output_results' and config['test_mode'] == 'online' and config['alg'] != 'htm':
-                dir_sub = os.path.join(dir_sub, f"window={config['window_size']}")
+                dir_sub = os.path.join(dir_sub, f"WINDOW={config['window_size']}")
                 make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
 
