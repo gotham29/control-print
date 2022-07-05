@@ -201,7 +201,7 @@ def validate_config(config):
     print(f"  alg = {config['alg']}")
     print(f"  train_models = {config['train_models']}")
     print(f"  test_mode = {config['test_mode']}")
-    print(f"  use_sp = {config['htm_config']['models_state']['usp_sp']}")
+    print(f"  use_sp = {config['htm_config']['models_state']['use_sp']}")
     print(f"  window_size = {config['window_size']}")
     print(f"  hz = {config['hz']}")
     print(f"  data_cap = {config['data_cap']}")

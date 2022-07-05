@@ -3,22 +3,25 @@ test_mode: online #batch, online
 train_models: true #true, false
 hz: 10
 window_size: 1
+data_cap: 1000000
+
 test_indices:
   - 1
   - 2
   - 3
+
 features:
   # - xs
   - ys
   - zs
   - dists
 
-data_cap: 1000000
 algs_types:
   lstm: prediction
   htm: anomaly
   dtw: distance
   edr: distance
+
 colinds_features:
   '0.3': xs
   '0.4': ys
@@ -27,6 +30,7 @@ colinds_features:
   '0.9': dists_y
   '0.10': dists_z
   '0': dists
+
 dirs:
   input: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_raw
   output_data: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_preprocessed
