@@ -1,23 +1,19 @@
-alg: dtw #lstm #htm, dtw, edr
+alg: htm #lstm #htm, dtw, edr
 test_mode: online #batch, online
 train_models: true #true, false
 hz: 10
 window_size: 1
-
-#lstm_n_epochs: 100
-data_cap: 1000000
 test_indices:
   - 1
   - 2
   - 3
 features:
-  - xs
+  # - xs
   - ys
   - zs
   - dists
-#  - dists_x
-#  - dists_y
-#  - dists_z
+
+data_cap: 1000000
 algs_types:
   lstm: prediction
   htm: anomaly
@@ -77,6 +73,7 @@ htm_config:
   models_state:
     model_for_each_feature: false
     save_outputs_accumulated: true
+    use_sp: false
     track_iter: 10
     track_tm: false
   timesteps_stop:
