@@ -1,0 +1,68 @@
+dir_rankscores: /Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores
+dir_out: /Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores
+xlabel: Experimental Settings
+ylabel: Rank Scores
+plotbars_filtertraits:
+#  HTM-online-10hz-xs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
+#  HTM-online-10hz-ys: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
+#  HTM-online-10hz-zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
+#  HTM-online-10hz-dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
+#  HTM-online-10hz-xs,ys: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
+#  HTM-online-10hz-xs,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
+#  HTM-online-10hz-ys,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
+#  HTM-online-10hz-xs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
+#  HTM-online-10hz-ys,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
+#  HTM-online-10hz-zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
+#  HTM-online-10hz-ys,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
+#  HTM-online-10hz-xs,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
+#  HTM-online-10hz-xs,ys,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
+#  HTM-online-10hz-xs,ys,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
+#  HTM-online-10hz-xs,ys,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
+
+  LSTM-batch-10hz-xs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
+  LSTM-batch-10hz-ys: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
+  LSTM-batch-10hz-zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
+  LSTM-batch-10hz-dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
+  LSTM-batch-10hz-xs,ys: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
+  LSTM-batch-10hz-xs,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
+  LSTM-batch-10hz-ys,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
+  LSTM-batch-10hz-xs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
+  LSTM-batch-10hz-ys,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
+  LSTM-batch-10hz-zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
+  LSTM-batch-10hz-ys,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
+  LSTM-batch-10hz-xs,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
+  LSTM-batch-10hz-xs,ys,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
+  LSTM-batch-10hz-xs,ys,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
+  LSTM-batch-10hz-xs,ys,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
+
+#  DTW-batch-10hz-xs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
+#  DTW-batch-10hz-ys: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
+#  DTW-batch-10hz-zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
+#  DTW-batch-10hz-dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
+#  DTW-batch-10hz-xs,ys: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
+#  DTW-batch-10hz-xs,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
+#  DTW-batch-10hz-ys,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
+#  DTW-batch-10hz-xs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
+#  DTW-batch-10hz-ys,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
+#  DTW-batch-10hz-zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
+#  DTW-batch-10hz-ys,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
+#  DTW-batch-10hz-xs,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
+#  DTW-batch-10hz-xs,ys,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
+#  DTW-batch-10hz-xs,ys,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
+#  DTW-batch-10hz-xs,ys,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
+
+#  EDR-batch-10hz-xs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
+#  EDR-batch-10hz-ys: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
+#  EDR-batch-10hz-zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
+#  EDR-batch-10hz-dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
+#  EDR-batch-10hz-xs,ys: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
+#  EDR-batch-10hz-xs,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
+#  EDR-batch-10hz-ys,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
+#  EDR-batch-10hz-xs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
+#  EDR-batch-10hz-ys,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
+#  EDR-batch-10hz-zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
+#  EDR-batch-10hz-ys,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
+#  EDR-batch-10hz-xs,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
+#  EDR-batch-10hz-xs,ys,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
+#  EDR-batch-10hz-xs,ys,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
+#  EDR-batch-10hz-xs,ys,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }

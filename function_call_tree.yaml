@@ -1,0 +1,54 @@
+run_pipeline
+
+  validate_config
+    make_dir
+
+  preprocess
+
+  if alg_type in ['prediction', 'anomaly']:
+    if not config['train_models']:
+      load_models()
+        load_pickle_object_as_data()
+    else:
+      if alg_type == 'prediction':
+        train_save_pred_models()
+          if alg == 'lstm':
+            compile_lstm()
+            train_lstm_batch()
+          elif alg == 'arima':
+            train_arima()
+          save_data_as_pickle()
+      else:  #alg_type == 'anomaly':
+        train_save_htm_models()
+          reset_htm_config()
+          htm_source.run_batch()
+          save_data_as_pickle()
+
+  if alg_type == 'prediction':
+    get_models_preds()
+      if test_mode == 'online':
+        get_preds_online()
+    get_models_dists_pred()
+      if test_mode == 'batch':
+        get_diff()
+      else:
+        get_diff_online()
+
+  elif alg_type == 'anomaly':
+    get_models_anomscores()
+      get_htm_dist()
+  else:
+    get_models_dists_dist()
+    if test_mode == 'batch':
+      get_dist()
+        if alg == 'dtw':
+          get_dtw_dist()
+        else:  # alg = 'edr'
+          get_edr_dist()
+    else:
+      get_dist_online()
+        get_dist()
+
+  write_rankscores()
+    make_dir()
+    get_rankscore()

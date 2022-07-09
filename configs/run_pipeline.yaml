@@ -1,9 +1,10 @@
-alg: htm #lstm #htm, dtw, edr
-test_mode: online #batch, online
+alg: dtw #lstm #htm, dtw, edr, arima
+test_mode: batch #batch, online
 train_models: true #true, false
 hz: 10
 window_size: 1
 data_cap: 1000000
+scaling: false  #false, minmax, standard
 
 test_indices:
   - 1
@@ -11,13 +12,14 @@ test_indices:
   - 3
 
 features:
-  # - xs
+  - xs
   - ys
   - zs
   - dists
 
 algs_types:
   lstm: prediction
+  arima: prediction
   htm: anomaly
   dtw: distance
   edr: distance
@@ -35,6 +37,7 @@ dirs:
   input: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_raw
   output_data: /Users/samheiserman/Desktop/PhD/Motion-Print/data/subjects_preprocessed
   output_models: /Users/samheiserman/Desktop/PhD/Motion-Print/output/models
+  output_scalers: /Users/samheiserman/Desktop/PhD/Motion-Print/output/scalers
   output_results: /Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores
 
 lstm_config:
@@ -45,24 +48,54 @@ lstm_config:
   optimizer: adam
   loss: mse
 
+arima_config:
+  start_p: 2
+  start_P: 1
+  start_q: 2
+  start_Q: 1
+  max_p: 5
+  max_d: 2
+  max_q: 5
+  max_P: 2
+  max_D: 1
+  max_Q: 2
+  m: 1
+  max_order: 5
+  scoring: mse
+
 htm_config:
   features:
+    - xs
     - ys
     - zs
     - dists
+  models_encoders:
+    minmax_percentiles:
+      - 1
+      - 99
+    n: 700
+    n_buckets: 140
+    sparsity: 0.05  #0.02
+    timestamp:
+      enable: false
+      feature: satellite_time
+      timeOfDay:
+        - 30
+        - 1
+      weekend: 21
   models_params:
     anomaly:
       period: 1000
     predictor:
       sdrc_alpha: 0.1
     sp:
-      boostStrength: 0.0
+      boostStrength: 2.0
       columnCount: 2048
       localAreaDensity: 0.04395604395604396
       potentialPct: 0.8
-      synPermActiveInc: 0.003
-      synPermConnected: 0.2
-      synPermInactiveDec: 0.0005
+      synPermActiveInc: 0.05  #0.003
+      synPermConnected: 0.1  #0.2
+      synPermInactiveDec: 0.085  #0.0005
     tm:
       activationThreshold: 13
       cellsPerColumn: 32

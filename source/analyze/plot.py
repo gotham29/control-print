@@ -6,7 +6,7 @@ import sys
 
 _SOURCE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 sys.path.append(_SOURCE_DIR)
-from source.utils.utils import get_dirfiles
+from source.utils.utils import get_dirfiles, load_config, get_args
 
 
 def get_plotbars_rss(all_rs_paths, plotbars_filtertraits):
@@ -18,7 +18,7 @@ def get_plotbars_rss(all_rs_paths, plotbars_filtertraits):
         for rspath in all_rs_paths:
             keep = True
             for trait, val in filtertraits.items():
-                if trait+val not in rspath:
+                if trait + val not in rspath:
                     keep = False
             if keep:
                 rspaths.append(rspath)
@@ -61,34 +61,31 @@ def plot_rs_boxplot(plotbars_rss, title, outpath, xlabel, ylabel):
     plt.savefig(outpath, bbox_inches="tight")
 
 
-""" TEST """
-if __name__ == '__main__':
-    dir_rankscores = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
-    dir_out = "/Users/samheiserman/Desktop/PhD/Motion-Print/output/rank_scores"
-    xlabel, ylabel = "Experimental Settings", "Rank Scores"
-
-    plotbars_filtertraits = {
-        'LSTM-online-10hz': {'ALG=':'lstm', 'TESTMODE=':'online', 'HZ=':'10'},
-        'LSTM-batch-10hz': {'ALG=':'lstm', 'TESTMODE=':'batch', 'HZ=':'10'},
-        'EDR-online-10hz': {'ALG=':'edr', 'TESTMODE=':'online', 'HZ=':'10'},
-        'EDR-batch-10hz': {'ALG=':'edr', 'TESTMODE=':'batch', 'HZ=':'10'},
-        'DTW-online-10hz': {'ALG=':'dtw', 'TESTMODE=':'online', 'HZ=':'10'},
-        'DTW-batch-10hz': {'ALG=':'dtw', 'TESTMODE=':'batch', 'HZ=':'10'},
-        'HTM-online-10hz': {'ALG=':'htm', 'TESTMODE=':'online', 'HZ=':'10'},
-    }
-
+def get_traits(plotbars_filtertraits):
     plotbars = list(plotbars_filtertraits.keys())
-    algs, testmodes, hzs = [], [], []
+    algs, testmodes, hzs, feats = [], [], [], []
     for pb in plotbars:
-        alg, testmode, hz = pb.split('-')
+        splits = pb.split('-')
+        alg, testmode, hz = splits[0],splits[1],splits[2]
+        if len(splits) == 4:
+            feat = splits[3]
+            feats.append(feat)
         algs.append(alg)
         testmodes.append(testmode)
         hzs.append(hz)
-    algs, testmodes, hzs = set(algs), set(testmodes), set(hzs)
+    algs, testmodes, hzs, feats = set(algs), set(testmodes), set(hzs), set(feats)
+    return algs, testmodes, hzs, feats
 
-    all_rs_paths = get_dirfiles(dir_rankscores, files_types=['csv'])
-    plotbars_rss = get_plotbars_rss(all_rs_paths, plotbars_filtertraits)
-    title = f"algs={','.join(algs)}; testmodes={','.join(testmodes)}; hzs={','.join(hzs)}"
-    outpath = os.path.join(dir_out, f"{title}.png")
 
-    plot_rs_boxplot(plotbars_rss, title, outpath, xlabel, ylabel)
+if __name__ == '__main__':
+
+    config = load_config(get_args().config_path)
+
+    algs, testmodes, hzs, feats = get_traits(config['plotbars_filtertraits'])
+    all_rs_paths = get_dirfiles(config['dir_rankscores'], files_types=['csv'])
+    plotbars_rss = get_plotbars_rss(all_rs_paths, config['plotbars_filtertraits'])
+
+    title = f"algs={','.join(algs)}; testmodes={','.join(testmodes)}; hzs={','.join(hzs)}"  #; feats={','.join(feats)}
+    outpath = os.path.join(config['dir_out'], f"{title}.png")
+
+    plot_rs_boxplot(plotbars_rss, title, outpath, config['xlabel'], config['ylabel'])

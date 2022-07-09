@@ -47,20 +47,20 @@ def compile_lstm(lstm_config, n_steps, n_features):
     return model
 
 
-def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, config_lstm, n_steps=1):  #n_epochs=100
+def train_lstm(subjects_traintest, config, n_steps=1):
     """ TODO --> Validate LSTM implementation """
 
     print(f"\nTraining {len(subjects_traintest)} LSTM models...")
 
-    make_dir(dir_models)
+    make_dir(config['dir_models'])
     subjects_models = {}
-    n_features = len(features)
+    n_features = len(config['features'])
     counter = 1
     time_start = time.time()
 
     for subj, traintest in subjects_traintest.items():
-        X_array = array(traintest['test'][features])
-        y_array = array(traintest['test'][features].shift(-1))
+        X_array = array(traintest['test'][config['features']])
+        y_array = array(traintest['test'][config['features']].shift(-1))
         # drop last row since NaN for y
         y_array = y_array[:len(y_array) - 1]
         X_array = X_array[:len(X_array) - 1]
@@ -70,10 +70,10 @@ def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, 
         """ SCALE DATA (?) """
 
         # build & compile model
-        model = compile_lstm(config_lstm, n_steps, n_features)
+        model = compile_lstm(config['lstm_config'], n_steps, n_features)
 
         # fit model -- CAN TRAIN IN BATCH BUT TEST IN ONLINE
-        model = train_lstm_batch(X, y_array, data_cap, config_lstm, model)
+        model = train_lstm_batch(X, y_array, config['data_cap'], config['lstm_config'], model)
         # if train_mode == 'batch':
         #     model = train_lstm_batch(X, y_array, data_cap, n_epochs, model)
         # else:
@@ -81,7 +81,7 @@ def train_lstm(subjects_traintest, window_size, features, data_cap, dir_models, 
 
         # save model
         subjects_models[subj] = model
-        path_mod = os.path.join(dir_models, f"{subj}.pkl")
+        path_mod = os.path.join(config['dir_models'], f"{subj}.pkl")
         save_data_as_pickle(model, path_mod)
 
         # track time

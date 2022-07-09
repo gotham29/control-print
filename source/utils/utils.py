@@ -101,7 +101,7 @@ def validate_config(config):
     for dir_type, dir in config['dirs'].items():
         if dir_type == 'htm' and config['alg'] != 'htm':
             continue
-        if dir_type not in ['output_models', 'output_results']:
+        if dir_type not in ['output_models', 'output_results', 'output_scalers']:
             assert os.path.exists(dir), f"{dir_type} not found! --> {dir}"
         else:
             # make sub-folders for models & results (but skip for distance algs since no models learned)
@@ -115,7 +115,7 @@ def validate_config(config):
                 dir_alg = os.path.join(dir_alg, f"TESTMODE={config['test_mode']}")
                 make_dir(dir_alg)
             # make sub-sub-dir for hz-test_indices-features combo
-            subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']}"
+            subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']}"
             dir_sub = os.path.join(dir_alg, subfolder)
             make_dir(dir_sub)
             # make sub-sub-sub-dir for window_size IF online test_mode AND not HTM
@@ -124,8 +124,13 @@ def validate_config(config):
                 make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
 
+    # Ensure scaling is valid
+    scaling_valid = [False, 'minmax', 'standard']
+    assert config[
+               'scaling'] in scaling_valid, f"scaling should be one of --> {scaling_valid}; found --> {config['scaling']}"
+
     # Ensure alg is valid
-    algs_valid = ['lstm', 'htm', 'dtw', 'edr']
+    algs_valid = ['lstm', 'htm', 'dtw', 'edr', 'arima']
     assert config['alg'] in algs_valid, f"alg should be one of --> {algs_valid}; found --> {config['alg']}"
 
     # Ensure test_mode is valid
@@ -199,6 +204,7 @@ def validate_config(config):
         invalid_fields) == 0, f"  Invalid fields found --> {sorted(invalid_fields)}; \n  Valids --> {list(config['colinds_features'].values())}"
 
     print(f"  alg = {config['alg']}")
+    print(f"  scaling = {config['scaling']}")
     print(f"  train_models = {config['train_models']}")
     print(f"  test_mode = {config['test_mode']}")
     print(f"  use_sp = {config['htm_config']['models_state']['use_sp']}")
@@ -229,7 +235,6 @@ def load_models(dir_models):
         pkl_path = os.path.join(dir_models, f)
         model = load_pickle_object_as_data(pkl_path)
         features_models[f.replace('.pkl', '')] = model
-    print('  DONE')
     return features_models
 
 

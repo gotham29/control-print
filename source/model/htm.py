@@ -41,29 +41,14 @@ def get_htm_dist(mod_dict, test, learn=False, predictor_config={'enable': False}
     return np.mean(aScores)
 
 
-def train_htm(subjects_traintest, config):  #path_htm_config
+def train_save_htm_models(subjects_traintest, config):
     print(f"\nTraining {len(subjects_traintest)} HTM models...")
-    # htm_config_orig = load_config(path_htm_config)
     htm_config_orig = reset_htm_config(config['htm_config'])
-    # save_config(htm_config_orig, path_htm_config)
     subjects_models = {}
-    # train HTM models for all subjs
     for subj, traintest in subjects_traintest.items():
-        # data_stream_dir = os.path.join(config['dirs']['output_data'], subj)
-        # outputs_dir = os.path.join(config['dirs']['output_results'], subj)
         models_dir = os.path.join(config['dirs']['output_models'], subj)
-        # make_dir(data_stream_dir)
-        # make_dir(outputs_dir)
         make_dir(models_dir)
-        # data_path = os.path.join(config['dirs']['output_data'], f"subj={subj}_train.csv")
-        # run_stream(config_path=path_htm_config,
-        #            data_path=data_path,
-        #            data_stream_dir=data_stream_dir,
-        #            outputs_dir=outputs_dir,
-        #            models_dir=models_dir)
         htm_config_orig = reset_htm_config(htm_config_orig)
-        # save_config(htm_config_orig, path_htm_config)
-        # subjects_models[subj] = load_models(models_dir)
         subjects_models[subj], subj_outputs = run_batch(cfg=htm_config_orig,
                                                         config_path=None,
                                                         learn=True,
