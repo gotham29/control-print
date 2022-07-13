@@ -1,8 +1,8 @@
 alg: dtw #lstm #htm, dtw, edr, arima
-test_mode: batch #batch, online
-train_models: true #true, false
-hz: 10
-window_size: 1
+test_mode: online #batch, online
+train_models: false #true, false
+hz: 5
+window_size: 100
 data_cap: 1000000
 scaling: false  #false, minmax, standard
 
@@ -15,7 +15,13 @@ features:
   - xs
   - ys
   - zs
-  - dists
+  # - dists
+
+algs_bestfieldsets:
+  dtw: [xs, ys, zs]
+  edr: [ys, zs, dists]
+  htm: [xs, ys, zs, dists]
+  lstm: [xs, ys, zs]
 
 algs_types:
   lstm: prediction
@@ -75,7 +81,7 @@ htm_config:
       - 99
     n: 700
     n_buckets: 140
-    sparsity: 0.05  #0.02
+    sparsity: 0.02
     timestamp:
       enable: false
       feature: satellite_time

@@ -35,7 +35,7 @@ def get_models_preds(subjects_traintest, subjects_models, test_mode, window_size
         X_array = array(traintest['test'][features])
         X_array = X_array[:len(X_array) - 1]
 
-        """ SCALE DATA HERE"""
+        """ SCALE DATA HERE """
         if scale:
             path_scaler = os.path.join(dir_scalers, f"{subjtest}.pkl")
             scaler = load_pickle_object_as_data(path_scaler)

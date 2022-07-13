@@ -120,7 +120,7 @@ def validate_config(config):
             make_dir(dir_sub)
             # make sub-sub-sub-dir for window_size IF online test_mode AND not HTM
             if dir_type == 'output_results' and config['test_mode'] == 'online' and config['alg'] != 'htm':
-                dir_sub = os.path.join(dir_sub, f"WINDOW={config['window_size']}")
+                dir_sub = os.path.join(dir_sub, f"WINDOW={config['window_size']};")
                 make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
 

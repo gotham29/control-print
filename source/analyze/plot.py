@@ -62,19 +62,15 @@ def plot_rs_boxplot(plotbars_rss, title, outpath, xlabel, ylabel):
 
 
 def get_traits(plotbars_filtertraits):
-    plotbars = list(plotbars_filtertraits.keys())
     algs, testmodes, hzs, feats = [], [], [], []
-    for pb in plotbars:
-        splits = pb.split('-')
-        alg, testmode, hz = splits[0],splits[1],splits[2]
-        if len(splits) == 4:
-            feat = splits[3]
-            feats.append(feat)
-        algs.append(alg)
-        testmodes.append(testmode)
-        hzs.append(hz)
+    for plotbar, filtertraits in plotbars_filtertraits.items():
+        algs.append(filtertraits['ALG='].upper())
+        hzs.append(filtertraits['HZ='])
+        feats.append(filtertraits['FEATURES='])
+        if 'TESTMODE=' in filtertraits:
+            testmodes.append(filtertraits['TESTMODE='])
     algs, testmodes, hzs, feats = set(algs), set(testmodes), set(hzs), set(feats)
-    return algs, testmodes, hzs, feats
+    return sorted(algs), sorted(testmodes), sorted(hzs), sorted(feats)
 
 
 if __name__ == '__main__':

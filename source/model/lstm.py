@@ -36,7 +36,7 @@ def compile_lstm(lstm_config, n_steps, n_features):
     for layer_i in range(lstm_config['n_layers']):
         if layer_i == 0:
             model.add(LSTM(units=lstm_config['n_units'],
-                           activation=lstm_config['activation'],
+                           activation=lstm_config['activation'], ### DONT NEED TO SPECIFY ACTIVATION
                            return_sequences=True,
                            input_shape=(n_steps, n_features)))
         else:
