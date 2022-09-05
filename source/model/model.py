@@ -130,12 +130,16 @@ def get_diff(true, pred):
 
 
 def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_mode):
+    feats_model = []
+    for ftype, feats in features.items():
+        feats_model += feats
+    feats_model = list(set(feats_model))
     subjstest_subjsdists = {}
     for subjtest1, traintest in subjects_traintest.items():
         subjstest_subjsdists[subjtest1] = {}
-        data1 = traintest['train'][features]
+        data1 = traintest['train'][feats_model]
         for subjtest2, traintest in subjects_traintest.items():
-            data2 = traintest['test'][features]
+            data2 = traintest['test'][feats_model]
             if test_mode == 'batch':
                 subjstest_subjsdists[subjtest1][subjtest2] = get_dist(data1, data2, alg)
             else:

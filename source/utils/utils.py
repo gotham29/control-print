@@ -6,6 +6,11 @@ import datetime as dt
 import yaml
 
 
+ALGS_KNOWN = ['htm', 'dtw', 'edr',
+            'VARIMA', 'NBEATSModel', 'TCNModel',
+            'TransformerModel', 'RNNModel', 'LightGBMModel' ]
+
+
 def get_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -122,9 +127,16 @@ def validate_config(config):
             # make alg dir
             dir_alg = os.path.join(dir_, f"ALG={config['alg']}")
             make_dir(dir_alg)
-            folder_sub = f"TESTMODE={config['test_mode']};HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};WINDOW={config['window_size']};"  #TIME_LAG={config['time_lag']};
-            if config['alg'] == 'lstm':
-                folder_sub += f"BATCH_SIZE={config['lstm_config']['batch_size']};"
+
+            # folder_sub = f"TESTMODE={config['test_mode']};HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};WINDOW={config['window_size']};"  #TIME_LAG={config['time_lag']};
+            folder_sub = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};"
+            if config['algs_types'][config['alg']] == 'distance':
+                folder_sub += f"TESTMODE={config['test_mode']};"
+                if config['test_mode'] == 'online':
+                    folder_sub += f"WINDOW={config['window_size']};"
+            # if config['alg'] == 'lstm':
+            #     folder_sub += f"BATCH_SIZE={config['lstm_config']['batch_size']};"
+
             dir_sub = os.path.join(dir_alg, folder_sub)
             make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
@@ -135,8 +147,7 @@ def validate_config(config):
                'scaling'] in scaling_valid, f"scaling should be one of --> {scaling_valid}; found --> {config['scaling']}"
 
     # Ensure alg is valid
-    algs_valid = ['htm', 'VARIMA', 'NBEATSModel', 'TCNModel', 'TransformerModel', 'RNNModel', 'LightGBMModel' ] #['lstm', 'htm', 'dtw', 'edr', 'arima']
-    assert config['alg'] in algs_valid, f"alg should be one of --> {algs_valid}; found --> {config['alg']}"
+    assert config['alg'] in ALGS_KNOWN, f"alg should be one of --> {ALGS_KNOWN}; found --> {config['alg']}"
 
     # Ensure test_mode is valid
     modes_valid = ['batch', 'online']
@@ -146,7 +157,7 @@ def validate_config(config):
     # Ensure alg_types is valid
     types_valid = ['prediction', 'anomaly', 'distance']
     for alg, algtype in config['algs_types'].items():
-        assert alg in algs_valid, f"all algs in algs_types should be in --> {algs_valid}; found --> {alg}"
+        assert alg in ALGS_KNOWN, f"all algs in algs_types should be in --> {ALGS_KNOWN}; found --> {alg}"
         assert algtype in types_valid, f"all types in algs_types should be in --> {types_valid}; found --> {algtype}"
 
     # Ensure data_cap >= 100

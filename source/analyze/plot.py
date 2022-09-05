@@ -88,7 +88,7 @@ if __name__ == '__main__':
     traits_vals = get_traits(config['plotbars_filtertraits'])
     title = ""
     for trait, vals in traits_vals.items():
-        title += f"{trait}={vals}; "
+        title += f"{trait}{sorted(vals)}; "
 
     outpath = os.path.join(config['dir_out'], f"{title}.png")
     plot_rs_boxplot(plotbars_rss, title, outpath, config['xlabel'], config['ylabel'])
