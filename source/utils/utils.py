@@ -1,7 +1,8 @@
 import argparse
 import os
 import pickle
-
+import pandas as pd
+import datetime as dt
 import yaml
 
 
@@ -78,7 +79,7 @@ def validate_config(config):
         'hz': int,
         'window_size': int,
         'test_indices': list,
-        'features': list,
+        'features': dict, #list,
         'train_models': bool,
         'dirs': dict,
         'algs_types': dict,
@@ -97,31 +98,35 @@ def validate_config(config):
         print(f"  {k} found type -->{wrongdtype}; expected --> {keys_dtypes[k]}")
     assert len(keys_wrongdtypes) == 0, "  wrong data types"
 
+    # # Ensure LSTM stateful=True if test_mode=online
+    # if config['test_mode'] == 'online':
+    #     config['lstm_config']['stateful'] = True
+    #     config['lstm_config']['shuffle'] = False
+    #     config['lstm_config']['batch_size'] = 1
+    # else:
+    #     config['lstm_config']['stateful'] = False
+    #     config['lstm_config']['reset_states'] = False
+
     # Ensure paths exist
-    for dir_type, dir in config['dirs'].items():
+    for dir_type, dir_ in config['dirs'].items():
         if dir_type == 'htm' and config['alg'] != 'htm':
             continue
-        if dir_type not in ['output_models', 'output_results', 'output_scalers']:
-            assert os.path.exists(dir), f"{dir_type} not found! --> {dir}"
+        if dir_type not in ['models', 'results', 'scalers']:
+            assert os.path.exists(dir_), f"{dir_type} not found! --> {dir_}"
         else:
             # make sub-folders for models & results (but skip for distance algs since no models learned)
-            if dir_type == 'output_models' and config['algs_types'][config['alg']] == 'distance':
+            if dir_type == 'models' and config['algs_types'][config['alg']] == 'distance':
+                continue
+            if dir_type == 'output_scaling' and not config['scaling']:
                 continue
             # make alg dir
-            dir_alg = os.path.join(dir, f"ALG={config['alg']}")
+            dir_alg = os.path.join(dir_, f"ALG={config['alg']}")
             make_dir(dir_alg)
-            # make sub-dir for test_model (for results, models not needed since always batch trained)
-            if dir_type == 'output_results':
-                dir_alg = os.path.join(dir_alg, f"TESTMODE={config['test_mode']}")
-                make_dir(dir_alg)
-            # make sub-sub-dir for hz-test_indices-features combo
-            subfolder = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']}"
-            dir_sub = os.path.join(dir_alg, subfolder)
+            folder_sub = f"TESTMODE={config['test_mode']};HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};WINDOW={config['window_size']};"  #TIME_LAG={config['time_lag']};
+            if config['alg'] == 'lstm':
+                folder_sub += f"BATCH_SIZE={config['lstm_config']['batch_size']};"
+            dir_sub = os.path.join(dir_alg, folder_sub)
             make_dir(dir_sub)
-            # make sub-sub-sub-dir for window_size IF online test_mode AND not HTM
-            if dir_type == 'output_results' and config['test_mode'] == 'online' and config['alg'] != 'htm':
-                dir_sub = os.path.join(dir_sub, f"WINDOW={config['window_size']};")
-                make_dir(dir_sub)
             config['dirs'][dir_type] = dir_sub
 
     # Ensure scaling is valid
@@ -130,7 +135,7 @@ def validate_config(config):
                'scaling'] in scaling_valid, f"scaling should be one of --> {scaling_valid}; found --> {config['scaling']}"
 
     # Ensure alg is valid
-    algs_valid = ['lstm', 'htm', 'dtw', 'edr', 'arima']
+    algs_valid = ['htm', 'VARIMA', 'NBEATSModel', 'TCNModel', 'TransformerModel', 'RNNModel', 'LightGBMModel' ] #['lstm', 'htm', 'dtw', 'edr', 'arima']
     assert config['alg'] in algs_valid, f"alg should be one of --> {algs_valid}; found --> {config['alg']}"
 
     # Ensure test_mode is valid
@@ -153,35 +158,38 @@ def validate_config(config):
     # Ensure 1 <= window_size <= 10000
     assert 1 <= config['window_size'] <= 10000, f"  window_size expected 1 - 10000 found --> {config['window_size']}"
 
-    # Ensure 100 <= lstm_n_epochs <= 500
-    assert 100 <= config[
-        'lstm_config'][
-        'n_epochs'] < 500, f"  lstm 'n_epochs' expected 100 - 500 found --> {config['lstm_config']['n_epochs']}"
+    # # Ensure 1 <= time_lag <= 100
+    # assert 1 <= config['time_lag'] <= 100, f"  time_lag expected 1 - 100 found --> {config['time_lag']}"
 
-    # Ensure 1 <= lstm_n_layers <= 5
-    assert 1 <= config[
-        'lstm_config'][
-        'n_layers'] < 5, f"  lstm 'n_layers' expected 1 - 5 found --> {config['lstm_config']['n_layers']}"
+    # # Ensure 100 <= lstm_n_epochs <= 500
+    # assert 100 <= config[
+    #     'lstm_config'][
+    #     'n_epochs'] < 1500, f"  lstm 'n_epochs' expected 100 - 500 found --> {config['lstm_config']['n_epochs']}"
 
-    # Ensure 2 <= n_units <= 200
-    assert 2 <= config[
-        'lstm_config'][
-        'n_units'] < 200, f"  lstm 'n_units' expected 2 - 200 found --> {config['lstm_config']['n_units']}"
+    # # Ensure 1 <= lstm_n_layers <= 5
+    # assert 1 <= config[
+    #     'lstm_config'][
+    #     'n_layers'] < 5, f"  lstm 'n_layers' expected 1 - 5 found --> {config['lstm_config']['n_layers']}"
 
-    # Ensure lstm 'activation' valid
-    valid_activations = ['relu']
-    assert config['lstm_config'][
-               'activation'] in valid_activations, f"Invalid activation found --> {config['lstm_config']['activation']}\n  valids --> {valid_activations}"
+    # # Ensure 2 <= n_units <= 200
+    # assert 1 <= config[
+    #     'lstm_config'][
+    #     'n_units'] < 200, f"  lstm 'n_units' expected 1 - 200 found --> {config['lstm_config']['n_units']}"
 
-    # Ensure lstm 'optimizer' valid
-    valid_optimizers = ['adam']
-    assert config['lstm_config'][
-               'optimizer'] in valid_optimizers, f"Invalid optimizer found --> {config['lstm_config']['optimizer']}\n  valids --> {valid_optimizers}"
+    # # Ensure lstm 'activation' valid
+    # valid_activations = ['relu']
+    # assert config['lstm_config'][
+    #            'activation'] in valid_activations, f"Invalid activation found --> {config['lstm_config']['activation']}\n  valids --> {valid_activations}"
 
-    # Ensure lstm 'loss' valid
-    valid_losses = ['mse']
-    assert config['lstm_config'][
-               'loss'] in valid_losses, f"Invalid loss found --> {config['lstm_config']['loss']}\n  valids --> {valid_losses}"
+    # # Ensure lstm 'optimizer' valid
+    # valid_optimizers = ['adam']
+    # assert config['lstm_config'][
+    #            'optimizer'] in valid_optimizers, f"Invalid optimizer found --> {config['lstm_config']['optimizer']}\n  valids --> {valid_optimizers}"
+
+    # # Ensure lstm 'loss' valid
+    # valid_losses = ['mse', 'mean_squared_error']
+    # assert config['lstm_config'][
+    #            'loss'] in valid_losses, f"Invalid loss found --> {config['lstm_config']['loss']}\n  valids --> {valid_losses}"
 
     # Ensure test_indicies range from 1 - 15
     non_ints = []
@@ -197,22 +205,30 @@ def validate_config(config):
 
     # Ensure fields in colinds_features
     invalid_fields = []
-    for f in config['features']:
-        if f not in config['colinds_features'].values():
-            invalid_fields.append(f)
+    for feat_type, feats in config['features'].items(): #for f in config['features']:
+        for f in feats:
+            if f not in config['colinds_features'].values():
+                invalid_fields.append(f)
     assert len(
         invalid_fields) == 0, f"  Invalid fields found --> {sorted(invalid_fields)}; \n  Valids --> {list(config['colinds_features'].values())}"
 
-    print(f"  alg = {config['alg']}")
-    print(f"  scaling = {config['scaling']}")
-    print(f"  train_models = {config['train_models']}")
-    print(f"  test_mode = {config['test_mode']}")
-    print(f"  use_sp = {config['htm_config']['models_state']['use_sp']}")
-    print(f"  window_size = {config['window_size']}")
-    print(f"  hz = {config['hz']}")
-    print(f"  data_cap = {config['data_cap']}")
-    print(f"  features = {config['features']}")
-    print(f"  test_indices = {config['test_indices']}")
+    print(f"  alg            = {config['alg']}")
+    print(f"  test_mode      = {config['test_mode']}")
+    print(f"  train_models   = {config['train_models']}")
+    print(f"  scaling        = {config['scaling']}")
+    print(f"  hz             = {config['hz']}")
+    # print(f"  time_lag       = {config['time_lag']}")
+    print(f"  window_size    = {config['window_size']}")
+    print(f"  test_indices   = {config['test_indices']}")
+    print(f"  features       = {config['features']}")
+    if config['alg'] == 'lstm':
+        print(f"  batch_size     = {config['lstm_config']['batch_size']}")
+    if config['data_cap'] < 1000:
+        print(f"  data_cap       = {config['data_cap']}")
+    if config['alg'] == 'htm':
+        print(f"  use_sp         = {config['htm_config']['models_state']['use_sp']}")
+
+    return config
 
 
 def load_models(dir_models):
@@ -254,3 +270,10 @@ def load_pickle_object_as_data(file_path):
     with open(file_path, 'rb') as f_handle:
         data = pickle.load(f_handle)
     return data
+
+
+def add_timecol(df, time_col):
+    base = pd.Timestamp.today()
+    ts_vals = [base + dt.timedelta(days=_) for _ in range(df.shape[0])]
+    df.insert(0, time_col, ts_vals)
+    return df

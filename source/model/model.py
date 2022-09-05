@@ -2,54 +2,82 @@ import numpy as np
 import os
 import sys
 import time
+import pandas as pd
+import datetime as dt
+from pandas import Series, concat
 
 _SOURCE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 sys.path.append(_SOURCE_DIR)
 
-from source.model.lstm import train_lstm_batch, compile_lstm
+from source.model.lstm import train_lstm, compile_lstm, forecast_lstm
 from source.model.dtw import get_dtw_dist
 from source.model.edr import get_edr_dist
 from source.model.htm import train_save_htm_models, get_htm_dist
 from source.model.arima import train_arima
-from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data
+from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data, add_timecol
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from numpy import array
 
-
-def get_preds_online(X, model, window_size, n_steps=1):
-    preds = []
-    for _ in range(1, len(X) + 1):
-        window_adj = min(_, window_size)
-        x = X[_ - window_adj:_]
-        y_hat = np.round_(model.predict_on_batch(x))  # predict on the "new" input
-        preds.append(y_hat)
-    return array(preds)
+from ts_source.pipeline.pipeline import run_pipeline
+from ts_source.model.model import get_preds_rolling, get_model_lag, MODNAMES_LAGPARAMS, MODNAMES_MODELS
 
 
-def get_models_preds(subjects_traintest, subjects_models, test_mode, window_size, features, dir_scalers, scale=False,
-                     n_steps=1):
+"""
+def get_preds_online(test_x, model, batch_size, n_features):
+    predictions = []
+    for x in test_x:
+        yhat = forecast_lstm(model, batch_size, x)
+        # # invert scaling
+        # yhat = invert_scale(scaler, X, yhat)
+        # # invert differencing
+        # yhat = inverse_difference(raw_values, yhat, len(test_scaled)+1-i)
+        predictions.append(yhat)
+    return array(predictions)
+"""
+
+def get_modname(model):
+    mod_name = None
+    for modname, mod in MODNAMES_MODELS.items():
+        if isinstance(model, mod):
+            mod_name = modname
+    return mod_name
+
+
+# def get_models_preds(config, subjects_traintest, subjects_models, test_mode, window_size, features, dir_scalers, scale=False,
+#                      time_lag=1, LAG_MIN=3):
+def get_models_preds(config, subjects_traintest, subjects_models, features, dir_scalers, scale=False, LAG_MIN=3):
     subjstest_subjspreds = {}
     for subjtest, traintest in subjects_traintest.items():
         subjstest_subjspreds[subjtest] = {}
-        X_array = array(traintest['test'][features])
-        X_array = X_array[:len(X_array) - 1]
-
-        """ SCALE DATA HERE """
+        """
+        # Prep data
+        test_x, test_y, test_x_conv = prep_data(traintest['test'][features], time_lag, len(features) )
+        # Scale data
         if scale:
             path_scaler = os.path.join(dir_scalers, f"{subjtest}.pkl")
             scaler = load_pickle_object_as_data(path_scaler)
-            X_array = unscale_data(X_array, scaler)
-
-        X = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1]))
-        for subjmod, mod in subjects_models.items():
+            test_x = unscale_data(test_x, scaler)
+        """
+        # Get preds
+        for subjmod, model in subjects_models.items():
+            """
             if test_mode == 'batch':
-                preds = mod.predict(X)
-            else:
-                preds = get_preds_online(X, mod, window_size)
+                preds = mod.predict(test_x_conv, verbose=0)
+            else:  # 'online'
+                preds = get_preds_online(test_x_conv, mod, config['lstm_config']['batch_size'], len(config['features']))
             if scale:
                 preds = unscale_data(preds, scaler)
-            subjstest_subjspreds[subjtest][subjmod] = preds
+            """
+            mod_name = get_modname(model)
+            features = model.training_series.components
+            preds = get_preds_rolling(model=model,
+                                        df=traintest['test'],
+                                        features=features,
+                                        LAG=max(LAG_MIN, get_model_lag(mod_name, model)),
+                                        time_col=config['time_col'],
+                                        forecast_horizon=config['forecast_horizon'])
+            subjstest_subjspreds[subjtest][subjmod] = pd.DataFrame(preds, columns=list(features)) #modnames_preds[ config['alg'] ] #preds
     return subjstest_subjspreds
 
 
@@ -62,33 +90,43 @@ def get_windowed_data(data, window_size):
     return array(rows)
 
 
-def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features, test_mode, window_size):
+# def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features, test_mode, window_size, time_lag):
+def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
+    # Get all model features
+    features_model = []
+    for ftype, feats in features.items():
+        features_model += feats
+    features_model = list(set(features_model))
+    # Get dists (pred erres) between all subjs
     subjstest_subjsdists = {}
     for subjtest, subjspreds in subjstest_subjspreds.items():
         subjstest_subjsdists[subjtest] = {}
-        # Get y_true by shifting test 1 time step
-        y_true = array(subjects_traintest[subjtest]['test'][features].shift(-1))
-        # Drop last row (since its NaN after shift)
-        y_true = y_true[:len(y_true) - 1]
-        # Calc dist
+        """
+        x_true, y_true, true_x_conv = prep_data(subjects_traintest[subjtest]['test'][features], time_lag, len(features))
+        """
+        subjtest_true = subjects_traintest[subjtest]['test']
         for subjpred, preds in subjspreds.items():
+            subjtest_true_adj = subjtest_true.tail(len(preds))
+            """
             if test_mode == 'batch':
-                subjstest_subjsdists[subjtest][subjpred] = get_diff(y_true, preds)
+                subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features_model].values, preds[features_model].values)  #y_true, preds
             else:
-                subjstest_subjsdists[subjtest][subjpred] = get_diff_online(y_true, preds, window_size)
+                subjstest_subjsdists[subjtest][subjpred] = get_diff_online(subjtest_true_adj[features_model].values, preds[features_model].values, window_size)  #y_true, preds, window_size
+            """
+            subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features_model].values, preds[features_model].values)
     return subjstest_subjsdists
 
-
-def get_diff_online(y_true, preds, window_size):
-    y_true = get_windowed_data(y_true, window_size)
+"""
+def get_diff_online(true, pred, window_size):
+    true = get_windowed_data(true, window_size)
     dist = 0
-    for _ in range(len(y_true)):
-        dist += get_diff(y_true[_], preds[_])
+    for _ in range(len(pred)):  #true
+        dist += get_diff(true[_], pred[_])
     return dist
+"""
 
-
-def get_diff(y_true, preds):
-    return abs(y_true - preds).sum()
+def get_diff(true, pred):
+    return abs(true - pred).sum()
 
 
 def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_mode):
@@ -102,7 +140,6 @@ def get_models_dists_dist(subjects_traintest, alg, window_size, features, test_m
                 subjstest_subjsdists[subjtest1][subjtest2] = get_dist(data1, data2, alg)
             else:
                 subjstest_subjsdists[subjtest1][subjtest2] = get_dist_online(data1, data2, window_size, alg)
-
     return subjstest_subjsdists
 
 
@@ -134,48 +171,107 @@ def get_models_anomscores(subjects_traintest, subjects_models, features):
     return subjstest_subjsanoms
 
 
-def train_save_pred_models(subjects_traintest, config, alg, n_steps=1):
+def difference_df(df, lag):
+    df_dict = {}
+    for c in df:
+        df_dict[f"{c} (lag={lag})"] = difference(df[c].values, lag)
+    return pd.DataFrame(df_dict)
+
+
+def difference(dataset, lag):
+    diff = list()
+    for i in range(lag, len(dataset)):
+        value = dataset[i] - dataset[i - lag]
+        diff.append(value)
+    return Series(diff)
+
+
+def timeseries_to_supervised(df, lag=1):
+    columns = [df.shift(i) for i in range(1, lag + 1)]
+    columns.append(df)
+    df = concat(columns, axis=1)
+    return df
+
+
+# def prep_data(df_y, time_lag, n_features):
+#     """ Trainsform to --> stationary """
+#     df_y = df_y.reset_index(inplace=False)
+#     df_y = df_y.drop(columns=['index'], inplace=False)
+#     timelags_dfdiffs = {}
+#     # COLLECT TIME_LAG DFS
+#     for tl in range(1, time_lag+1):
+#         df_diff = difference_df(df=df_y, lag=tl)  #time_lag
+#         df_nan = pd.DataFrame( {c:[np.nan for _ in range(tl)] for c in df_diff} )
+#         df_diff = pd.concat([df_nan, df_diff], axis=0)
+#         df_diff = df_diff.reset_index(inplace=False)
+#         df_diff = df_diff.drop(columns=['index'], inplace=False)
+#         timelags_dfdiffs[tl] = df_diff
+#     df_diffs = list(timelags_dfdiffs.values())
+#     # CONCAT TIME_LAG DFS
+#     df_x = pd.concat(df_diffs, axis=1)
+#     df_xy = pd.concat([df_x, df_y], axis=1)
+#     # DROP NA
+#     df_x = df_x.dropna(how='any', axis=0, inplace=False)
+#     df_y = df_y.dropna(how='any', axis=0, inplace=False)
+#     df_xy = df_xy.dropna(how='any', axis=0, inplace=False)
+#     # RESHAPE
+#     df_x_conv = array(df_x).reshape(df_x.shape[0], time_lag, n_features)  #df_x.shape[1]
+#     return array(df_x), array(df_y), df_x_conv
+
+
+def train_save_pred_models(subjects_traintest, config, alg):  #time_lag=1
     print(f"\nTraining {len(subjects_traintest)} {alg.upper()} models...")
-
-    make_dir(config['dirs']['output_models'])
+    make_dir(config['dirs']['models'])
     subjects_models = {}
-    n_features = len(config['features'])
+    features = []
+    for ftype, fs in config['features'].items():
+        features += [f for f in fs if f not in features]
+    n_features = len(features)  #len(config['features'])
     counter, time_start = 1, time.time()
-
     for subj, traintest in subjects_traintest.items():
+        print(f"  subj = {subj}")
+        # train = traintest['train'][features]  #[config['features']]
+        # train_x, train_y, train_x_conv = prep_data(train, time_lag, n_features)
 
-        X_array = array(traintest['train'][config['features']])  # BUG FIXED --> test
-        y_array = array(traintest['train'][config['features']].shift(-1))  # BUG FIXED -->test
-        # drop last row since NaN for y
-        y_array = y_array[:len(y_array) - 1]
-        X_array = X_array[:len(X_array) - 1]
-
-        """ SCALE DATA HERE """
-        if config['scaling']:
-            X_array, scaler = scale_data(data=X_array, method=config['scaling'])
-            y_array, scaler = scale_data(data=y_array, method=config['scaling'])
-
-        X_conv = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1]))  # 1-->window_size
-
-        # fit model -- CAN TRAIN IN BATCH BUT TEST IN ONLINE
+        """
+        print(f"    train_x_conv SHAPE = {train_x_conv.shape}")
+        # Fit model
         if alg == 'lstm':
-            model = compile_lstm(config['lstm_config'], n_steps, n_features)
-            model = train_lstm_batch(X_conv, y_array, config['data_cap'], config['lstm_config'], model)
-        elif alg == 'arima':
-            model = train_arima(X_array, config['arima_config'], config['data_cap'])
-
-        # save model & scaler
+            model = compile_lstm(train_x_conv, config['lstm_config'], time_lag, n_features)
+            model = train_lstm(train_x_conv, train_y, config['data_cap'], config['lstm_config'], model)
+        # Save model & scaler
         subjects_models[subj] = model
-        path_mod = os.path.join(config['dirs']['output_models'], f"{subj}.pkl")
+        path_mod = os.path.join(config['dirs']['models'], f"{subj}.pkl")
         save_data_as_pickle(model, path_mod)
         if config['scaling']:
-            path_scaler = os.path.join(config['dirs']['output_scalers'], f"{subj}.pkl")
+            path_scaler = os.path.join(config['dirs']['scalers'], f"{subj}.pkl")
             save_data_as_pickle(scaler, path_scaler)
+        """
+        # Train model (ts_source)
+        config_ts = {k:v for k,v in config.items()}
+        config_ts['train_models'] = True
+        config_ts['modnames_grids'] = {k:v for k,v in config_ts['modnames_grids'].items() if k == alg}
+        if config_ts['time_col'] not in traintest['train']:
+            traintest['train'] = add_timecol(traintest['train'], config_ts['time_col'])
+            traintest['test'] = add_timecol(traintest['test'], config_ts['time_col'])
 
-        # track time
+        output_dirs = {'data': os.path.join(config['dirs']['data'], subj),
+                        'results': os.path.join(config['dirs']['results'], subj),
+                        'models': os.path.join(config['dirs']['models'], subj),
+                        'scalers': os.path.join(config['dirs']['scalers'], subj)}
+
+        modnames_models, modname_best, modnames_preds       = run_pipeline(config=config_ts,
+                                                                            data=traintest['train'],
+                                                                            data_path=False,
+                                                                            output_dir=False,
+                                                                            output_dirs=output_dirs)
+        subjects_models[subj] = modnames_models[modname_best]
+
+        # Track time
         time_elapsed_mins = round((time.time() - time_start) / 60, 2)
-        print(f"  Trained {counter} of {len(subjects_traintest)} models; elapsed minutes = {time_elapsed_mins}")
+        print(f"    Trained {counter} of {len(subjects_traintest)} models; elapsed minutes = {time_elapsed_mins}")
         counter += 1
+
     return subjects_models
 
 

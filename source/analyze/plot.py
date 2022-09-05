@@ -23,14 +23,18 @@ def get_plotbars_rss(all_rs_paths, plotbars_filtertraits):
             if keep:
                 rspaths.append(rspath)
         # gather rankscores from eligibles
-        if len(rspaths) == 0:
-            print("  files found --> NONE")
-            continue
         print(f"  files found --> {len(rspaths)}")
+        if len(rspaths) == 0:
+            continue
         plotbars_rss[plotbar] = []
         for rspath in rspaths:
             rs = list(pd.read_csv(rspath)['RankScores'].values)
             plotbars_rss[plotbar] += rs
+
+    print(f"\nplotbars_rss...")
+    for k,v in plotbars_rss.items():
+        print(f"  {k} = {v}")
+
     return plotbars_rss
 
 
@@ -62,26 +66,29 @@ def plot_rs_boxplot(plotbars_rss, title, outpath, xlabel, ylabel):
 
 
 def get_traits(plotbars_filtertraits):
-    algs, testmodes, hzs, feats = [], [], [], []
+    traits_vals = {}
     for plotbar, filtertraits in plotbars_filtertraits.items():
-        algs.append(filtertraits['ALG='].upper())
-        hzs.append(filtertraits['HZ='])
-        feats.append(filtertraits['FEATURES='])
-        if 'TESTMODE=' in filtertraits:
-            testmodes.append(filtertraits['TESTMODE='])
-    algs, testmodes, hzs, feats = set(algs), set(testmodes), set(hzs), set(feats)
-    return sorted(algs), sorted(testmodes), sorted(hzs), sorted(feats)
+        for trait, trait_val in filtertraits.items():
+            try:
+                traits_vals[trait].append(trait_val)
+            except:
+                traits_vals[trait] = [trait_val]
+    traits_vals = {t:list(set(v)) for t,v in traits_vals.items()}
+    return traits_vals
 
 
 if __name__ == '__main__':
 
     config = load_config(get_args().config_path)
 
-    algs, testmodes, hzs, feats = get_traits(config['plotbars_filtertraits'])
     all_rs_paths = get_dirfiles(config['dir_rankscores'], files_types=['csv'])
+    all_rs_paths = [f for f in all_rs_paths if 'rankscores.csv' in f]
     plotbars_rss = get_plotbars_rss(all_rs_paths, config['plotbars_filtertraits'])
 
-    title = f"algs={','.join(algs)}; testmodes={','.join(testmodes)}; hzs={','.join(hzs)}"  #; feats={','.join(feats)}
-    outpath = os.path.join(config['dir_out'], f"{title}.png")
+    traits_vals = get_traits(config['plotbars_filtertraits'])
+    title = ""
+    for trait, vals in traits_vals.items():
+        title += f"{trait}={vals}; "
 
+    outpath = os.path.join(config['dir_out'], f"{title}.png")
     plot_rs_boxplot(plotbars_rss, title, outpath, config['xlabel'], config['ylabel'])

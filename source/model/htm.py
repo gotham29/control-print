@@ -46,7 +46,7 @@ def train_save_htm_models(subjects_traintest, config):
     htm_config_orig = reset_htm_config(config['htm_config'])
     subjects_models = {}
     for subj, traintest in subjects_traintest.items():
-        models_dir = os.path.join(config['dirs']['output_models'], subj)
+        models_dir = os.path.join(config['dirs']['models'], subj)
         make_dir(models_dir)
         htm_config_orig = reset_htm_config(htm_config_orig)
         subjects_models[subj], subj_outputs = run_batch(cfg=htm_config_orig,
@@ -56,12 +56,13 @@ def train_save_htm_models(subjects_traintest, config):
                                                         iter_print=1000,
                                                         features_models={})
         multiple_models = True if len(subjects_models[subj]) > 1 else False
+        features = list(set(config['features']['in'] + config['features']['pred'] + [config['time_col']] ))
         if multiple_models:
-            for feat in config['features']:
+            for feat in features: #config['features']:
                 outpath = os.path.join(models_dir, f"{feat}.pkl")
                 save_data_as_pickle(subjects_models[subj][feat], outpath)
         else:
-            multi_feat = f"megamodel_features={len(config['features'])}"
+            multi_feat = f"megamodel_features={len(features)}"  #len(config['features'])
             outpath = os.path.join(models_dir, f"{multi_feat}.pkl")
             save_data_as_pickle(subjects_models[subj][multi_feat], outpath)
 

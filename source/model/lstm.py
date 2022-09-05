@@ -12,81 +12,68 @@ sys.path.append(_SOURCE_DIR)
 from source.utils.utils import make_dir, save_data_as_pickle
 
 
-def train_lstm_batch(X, y_array, data_cap, config_lstm, model):
-    model.fit(X[:data_cap], y_array[:data_cap], epochs=config_lstm['n_epochs'], verbose=0)
+def forecast_lstm(model, batch_size, X):
+    # print("\nforecast_lstm()")
+    # print(f"  X shape = {X.shape}")
+    # X = X.reshape(1, 1, len(X))
+    # print(f"  X re-shaped = {X.shape}")
+    X_re = X.reshape(1, X.shape[0], X.shape[1])
+    yhat = model.predict(X_re, batch_size=batch_size, verbose=0)
+    return yhat
+
+
+def train_lstm(X, y, data_cap, config_lstm, model):
+    if config_lstm['stateful']:
+        for _ in range(config_lstm['n_epochs']):
+            model.fit(X[:data_cap], y[:data_cap], epochs=1, batch_size=config_lstm['batch_size'], verbose=0, shuffle=config_lstm['shuffle'])
+            if config_lstm['reset_states']:
+                model.reset_states()
+    else:
+        model.fit(X[:data_cap], y[:data_cap], epochs=config_lstm['n_epochs'], batch_size=config_lstm['batch_size'], verbose=0, shuffle=config_lstm['shuffle'])
+    # model.fit(X[:data_cap], y[:data_cap], epochs=config_lstm['n_epochs'], verbose=0)
     return model
 
 
-# def train_lstm_online(X, Y, window_size, model):
-#     N = X.shape[2]
-#     for _ in range(X.shape[0]):
-#         x = X[_].reshape(-1, window_size, N)
-#         y = Y[_]
-#         model.train_on_batch(x, y)  # runs a single gradient update
-#     return model
+def compile_lstm(X, config_lstm, n_steps, n_outputs):
+    """
+    * Random initial conditions for LSTM net cause different results each time a given config is trained
 
+    Batch size of 1
+        --> is required as we will be using walk-forward validation and making one-step forecasts
+        --> means that the model will be fit using online training (vs batch or mini-batch)
 
-def compile_lstm(lstm_config, n_steps, n_features):
-    # lstm_config = {'n_layers': 2, 'n_units': n_units, 'activation': 'relu', 'optimizer': 'adam', 'loss': 'mse'}
-    # model = Sequential()
-    # model.add(LSTM(n_units, activation='relu', return_sequences=True, input_shape=(n_steps, n_features)))
-    # model.add(LSTM(n_units, activation='relu'))
-    # model.add(Dense(n_features))
+    LSTM flavors to try:
+        --> A Stateful LSTM
+        --> A Stateless LSTM with the same configuration.
+        --> A Stateless LSTM with shuffling during training.
+        Expectations:
+            --> The stateful LSTM will outperform the stateless LSTM
+            --> The stateless LSTM without shuffling will outperform the stateless LSTM with shuffling
+            --> Stateless and stateful LSTMs should produce near identical results when using the same batch size
+            --> Resetting state after each training epoch results in better test performance.
+            --> Seeding state in the LSTM by making predictions on the training dataset results in better test performance.
+            --> Not resetting state between one-step predictions on the test set results in better test set performance.
+    """
     model = Sequential()
-    for layer_i in range(lstm_config['n_layers']):
-        if layer_i == 0:
-            model.add(LSTM(units=lstm_config['n_units'],
-                           activation=lstm_config['activation'], ### DONT NEED TO SPECIFY ACTIVATION
-                           return_sequences=True,
-                           input_shape=(n_steps, n_features)))
-        else:
-            model.add(LSTM(units=lstm_config['n_units'],
-                           activation=lstm_config['activation']))
-    model.add(Dense(n_features))
-    model.compile(optimizer=lstm_config['optimizer'], loss=lstm_config['loss'])
+    model.add(LSTM(config_lstm['n_units'], batch_input_shape=(config_lstm['batch_size'], X.shape[1], X.shape[2]), stateful=config_lstm['stateful']))
+    model.add(Dense(n_outputs))
+    model.compile(loss=config_lstm['loss'], optimizer=config_lstm['optimizer'])
+    # model = Sequential()
+    # for layer_i in range(config_lstm['n_layers']):
+    #     if layer_i == 0:
+    #         model.add(LSTM(units=config_lstm['n_units'],
+    #                        batch_input_shape=(config_lstm['batch_size'], n_steps, n_features),
+    #                        return_sequences=True,
+    #                        stateful=config_lstm['stateful']))
+    #     else:
+    #         model.add(LSTM(units=config_lstm['n_units'],
+    #                        batch_input_shape=(config_lstm['batch_size'], n_steps, n_features),
+    #                        stateful=config_lstm['stateful']))
+    # model.add(Dense(1)) #n_features
+    # model.compile(optimizer=config_lstm['optimizer'], loss=config_lstm['loss'])
     return model
 
 
-def train_lstm(subjects_traintest, config, n_steps=1):
-    """ TODO --> Validate LSTM implementation """
+# def convert_data_for_lstm(X_array, n_steps):
+#     return X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1]))  # 1-->window_size
 
-    print(f"\nTraining {len(subjects_traintest)} LSTM models...")
-
-    make_dir(config['dir_models'])
-    subjects_models = {}
-    n_features = len(config['features'])
-    counter = 1
-    time_start = time.time()
-
-    for subj, traintest in subjects_traintest.items():
-        X_array = array(traintest['test'][config['features']])
-        y_array = array(traintest['test'][config['features']].shift(-1))
-        # drop last row since NaN for y
-        y_array = y_array[:len(y_array) - 1]
-        X_array = X_array[:len(X_array) - 1]
-        X = X_array.reshape((X_array.shape[0], n_steps, X_array.shape[1])) #1-->window_size
-        Y = y_array.reshape((y_array.shape[0], n_steps, y_array.shape[1])) #1-->window_size
-
-        """ SCALE DATA (?) """
-
-        # build & compile model
-        model = compile_lstm(config['lstm_config'], n_steps, n_features)
-
-        # fit model -- CAN TRAIN IN BATCH BUT TEST IN ONLINE
-        model = train_lstm_batch(X, y_array, config['data_cap'], config['lstm_config'], model)
-        # if train_mode == 'batch':
-        #     model = train_lstm_batch(X, y_array, data_cap, n_epochs, model)
-        # else:
-        #     model = train_lstm_online(X, Y, window_size, model)
-
-        # save model
-        subjects_models[subj] = model
-        path_mod = os.path.join(config['dir_models'], f"{subj}.pkl")
-        save_data_as_pickle(model, path_mod)
-
-        # track time
-        time_elapsed_mins = round((time.time() - time_start) / 60, 2)
-        print(f"  Trained {counter} of {len(subjects_traintest)} models; elapsed minutes = {time_elapsed_mins}")
-        counter += 1
-
-    return subjects_models
