@@ -60,7 +60,12 @@ def train_save_htm_models(subjects_traintest, config):
         if multiple_models:
             for feat in features: #config['features']:
                 outpath = os.path.join(models_dir, f"{feat}.pkl")
-                save_data_as_pickle(subjects_models[subj][feat], outpath)
+                # DEBUG
+                try:
+                    save_data_as_pickle(subjects_models[subj][feat], outpath)
+                except Exception as e:
+                    print(f"error --> {e}")
+                    print(f"subjects_models[subj] KEYS = {list(subjects_models[subj].keys())}")
         else:
             multi_feat = f"megamodel_features={len(features)}"  #len(config['features'])
             outpath = os.path.join(models_dir, f"{multi_feat}.pkl")

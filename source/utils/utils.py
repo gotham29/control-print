@@ -128,14 +128,11 @@ def validate_config(config):
             dir_alg = os.path.join(dir_, f"ALG={config['alg']}")
             make_dir(dir_alg)
 
-            # folder_sub = f"TESTMODE={config['test_mode']};HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};WINDOW={config['window_size']};"  #TIME_LAG={config['time_lag']};
-            folder_sub = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};"
+            folder_sub = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};GRIDSEARCH={config['do_gridsearch']};"
             if config['algs_types'][config['alg']] == 'distance':
                 folder_sub += f"TESTMODE={config['test_mode']};"
                 if config['test_mode'] == 'online':
                     folder_sub += f"WINDOW={config['window_size']};"
-            # if config['alg'] == 'lstm':
-            #     folder_sub += f"BATCH_SIZE={config['lstm_config']['batch_size']};"
 
             dir_sub = os.path.join(dir_alg, folder_sub)
             make_dir(dir_sub)
