@@ -1,5 +1,5 @@
-alg: dtw  #TCNModel, TransformerModel, RNNModel
-#htm, dtw, edr, VARIMA, LightGBMModel, NBEATSModel
+alg: TransformerModel  #TCNModel,
+#htm, dtw, edr, VARIMA, LightGBMModel, NBEATSModel, RNNModel
 
 train_models: True
 hz: 10
@@ -103,8 +103,8 @@ modnames_grids:
       - 5
       # - 10
     model: ## ["RNN", "LSTM", "GRU"]
-      - RNN
-      # - LSTM
+      # - RNN
+      - LSTM
     hidden_dim:
       - 25
     n_rnn_layers:

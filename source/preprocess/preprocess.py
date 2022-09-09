@@ -8,7 +8,7 @@ from os.path import isfile, join
 _SOURCE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 sys.path.append(_SOURCE_DIR)
 
-from source.utils.utils import add_timecol
+from ts_source.utils.utils import add_timecol
 
 def get_dists(row):
     return np.sqrt(row['dists_x'] ** 2) + np.sqrt(row['dists_y'] ** 2) + np.sqrt(row['dists_z'] ** 2)

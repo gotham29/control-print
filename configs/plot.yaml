@@ -5,15 +5,16 @@ ylabel: Rank Scores
 
 plotbars_filtertraits:
   EDR: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  # EDR--batch: { ALG=: edr, HZ=: 10;, TESTMODE=: batch;}
+  RNNModel: { ALG=: RNNModel, HZ=: 10;}
   DTW: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  # DTW--batch: { ALG=: dtw, HZ=: 10;, TESTMODE=: batch;}
   NBEATSModel: { ALG=: NBEATSModel, HZ=: 10;}
   VARIMA: { ALG=: VARIMA, HZ=: 10;}
   LGBM: { ALG=: LightGBMModel, HZ=: 10;}
   HTM: { ALG=: htm, HZ=: 10;}
-  # TCNModel: { ALG=: TCNModel, HZ=: 10;}
-  # RNNModel: { ALG=: RNNModel, HZ=: 10;}
-  # TransformerModel: { ALG=: TransformerModel, HZ=: 10;}
+  TCNModel: { ALG=: TCNModel, HZ=: 10;}
+  TransformerModel: { ALG=: TransformerModel, HZ=: 10;}
+
+  # EDR--batch: { ALG=: edr, HZ=: 10;, TESTMODE=: batch;}
+  # DTW--batch: { ALG=: dtw, HZ=: 10;, TESTMODE=: batch;}
   # DTW-online-window=1: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
   # EDR-online-window=1: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}

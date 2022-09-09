@@ -14,7 +14,7 @@ from source.model.dtw import get_dtw_dist
 from source.model.edr import get_edr_dist
 from source.model.htm import train_save_htm_models, get_htm_dist
 from source.model.arima import train_arima
-from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data, add_timecol, sort_dict
+from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data, sort_dict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from numpy import array
@@ -248,9 +248,6 @@ def train_save_pred_models(subjects_traintest, config, alg):  #time_lag=1
         config_ts = {k:v for k,v in config.items()}
         config_ts['train_models'] = True
         config_ts['modnames_grids'] = {k:v for k,v in config_ts['modnames_grids'].items() if k == alg}
-        # if config_ts['time_col'] not in traintest['train']:
-        #     traintest['train'] = add_timecol(traintest['train'], config_ts['time_col'])
-        #     traintest['test'] = add_timecol(traintest['test'], config_ts['time_col'])
 
         output_dirs = {'data': os.path.join(config['dirs']['data'], subj),
                         'results': os.path.join(config['dirs']['results'], subj),

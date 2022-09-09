@@ -7,7 +7,14 @@ import yaml
 from typing import List, Optional, Sequence, Tuple, Union
 
 from htm_source.utils.utils import load_models as load_models_htm
-from ts_source.utils.utils import get_dir_data, MODNAMES_OBJTYPES
+from ts_source.utils.utils import (make_dir,
+                                    load_darts,
+                                    load_config,
+                                    get_dirfiles,
+                                    get_dir_data,
+                                    MODNAMES_OBJTYPES,
+                                    save_data_as_pickle,
+                                    load_pickle_object_as_data)
 from darts.models.forecasting.forecasting_model import ForecastingModel
 from darts.models.forecasting.torch_forecasting_model import TorchForecastingModel
 
@@ -25,59 +32,59 @@ def get_args():
     return parser.parse_args()
 
 
-def make_dir(mydir):
-    if not os.path.exists(mydir):
-        os.mkdir(mydir)
+# def make_dir(mydir):
+#     if not os.path.exists(mydir):
+#         os.mkdir(mydir)
 
 
-def get_dirfiles(dir_root, files_types=None):
-    subfiles = []
-    for path, subdirs, files in os.walk(dir_root):
-        for name in files:
-            subfiles.append(os.path.join(path, name))
-    if files_types is not None:
-        assert isinstance(files_types, list), f"files_types should be a list, found --> {type(files_types)}"
-        subfiles = [s for s in subfiles if s.split('.')[-1] in files_types]
-    return subfiles
+# def get_dirfiles(dir_root, files_types=None):
+#     subfiles = []
+#     for path, subdirs, files in os.walk(dir_root):
+#         for name in files:
+#             subfiles.append(os.path.join(path, name))
+#     if files_types is not None:
+#         assert isinstance(files_types, list), f"files_types should be a list, found --> {type(files_types)}"
+#         subfiles = [s for s in subfiles if s.split('.')[-1] in files_types]
+#     return subfiles
 
 
-def load_config(yaml_path):
-    """
-    Purpose:
-        Load config from path
-    Inputs:
-        yaml_path
-            type: str
-            meaning: .yaml path to load from
-    Outputs:
-        cfg
-            type: dict
-            meaning: config (yaml) -- loaded
-    """
-    with open(yaml_path, 'r') as yamlfile:
-        cfg = yaml.load(yamlfile, Loader=yaml.FullLoader)
-    return cfg
+# def load_config(yaml_path):
+#     """
+#     Purpose:
+#         Load config from path
+#     Inputs:
+#         yaml_path
+#             type: str
+#             meaning: .yaml path to load from
+#     Outputs:
+#         cfg
+#             type: dict
+#             meaning: config (yaml) -- loaded
+#     """
+#     with open(yaml_path, 'r') as yamlfile:
+#         cfg = yaml.load(yamlfile, Loader=yaml.FullLoader)
+#     return cfg
 
 
-def save_data_as_pickle(data_struct, f_path):
-    """
-    Purpose:
-        Save data to pkl file
-    Inputs:
-        data_struct
-            type: any
-            meaning: data to save in pkl format
-        f_path
-            type: str
-            meaning: path to pkl file
-    Outputs:
-        True
-            type: bool
-            meaning: function ran
-    """
-    with open(f_path, 'wb') as handle:
-        pickle.dump(data_struct, handle)
-    return True
+# def save_data_as_pickle(data_struct, f_path):
+#     """
+#     Purpose:
+#         Save data to pkl file
+#     Inputs:
+#         data_struct
+#             type: any
+#             meaning: data to save in pkl format
+#         f_path
+#             type: str
+#             meaning: path to pkl file
+#     Outputs:
+#         True
+#             type: bool
+#             meaning: function ran
+#     """
+#     with open(f_path, 'wb') as handle:
+#         pickle.dump(data_struct, handle)
+#     return True
 
 
 def validate_config(config):
@@ -279,34 +286,27 @@ def load_models(dir_:str,
     return features_models
 
 
-def load_darts(path_, darts_modeltype):
-    model = MODNAMES_OBJTYPES[darts_modeltype].load(path_)
-    return model
+# def load_darts(path_, darts_modeltype):
+#     model = MODNAMES_OBJTYPES[darts_modeltype].load(path_)
+#     return model
 
 
-def load_pickle_object_as_data(file_path):
-    """
-    Purpose:
-        Load data from pkl file
-    Inputs:
-        file_path
-            type: str
-            meaning: path to pkl file
-    Outputs:
-        data
-            type: pkl
-            meaning: pkl data loaded
-    """
-    with open(file_path, 'rb') as f_handle:
-        data = pickle.load(f_handle)
-    return data
-
-
-def add_timecol(df, time_col):
-    base = pd.Timestamp.today()
-    ts_vals = [base + dt.timedelta(days=_) for _ in range(df.shape[0])]
-    df.insert(0, time_col, ts_vals)
-    return df
+# def load_pickle_object_as_data(file_path):
+#     """
+#     Purpose:
+#         Load data from pkl file
+#     Inputs:
+#         file_path
+#             type: str
+#             meaning: path to pkl file
+#     Outputs:
+#         data
+#             type: pkl
+#             meaning: pkl data loaded
+#     """
+#     with open(file_path, 'rb') as f_handle:
+#         data = pickle.load(f_handle)
+#     return data
 
 
 def sort_dict(dict_, by='value', ascending=False):
