@@ -1,18 +1,18 @@
-alg: NBEATSModel  #TCNModel, TransformerModel, RNNModel
-#htm, #dtw, #edr, VARIMA, LightGBMModel
+alg: dtw  #TCNModel, TransformerModel, RNNModel
+#htm, dtw, edr, VARIMA, LightGBMModel, NBEATSModel
 
-train_models: True  #Fa;lse
+train_models: True
 hz: 10
+test_mode: batch #batch, online
+window_size: 1
 do_gridsearch: False
+
 test_prop: 0.3
-data_cap: 100000 #300
+data_cap: 100000
 forecast_horizon: 1
 time_col: timestamp
+scaling: False  #False, minmax, standard
 eval_metric: rmse #mae, mse, rmse, mape, mase, ope, marre, r2_score, dtw_metric
-####################
-test_mode: online #batch, online
-window_size: 1
-scaling: False  #false, minmax, standard
 
 features:
   in:
@@ -134,7 +134,6 @@ modnames_grids:
     # likelihood: str = None,
     #   = ['quantile', 'poisson']
 
-
 test_indices:
   - 1
   - 2
@@ -154,10 +153,9 @@ algs_types:
   TransformerModel: prediction
   RNNModel: prediction
   LightGBMModel: prediction
-  # lstm: prediction
-  # arima: prediction
   dtw: distance
   edr: distance
+  # lstm: prediction
 
 colinds_features:
   '0.3': xs

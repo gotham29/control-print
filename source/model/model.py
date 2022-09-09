@@ -44,8 +44,6 @@ def get_modname(model):
     return mod_name
 
 
-# def get_models_preds(config, subjects_traintest, subjects_models, test_mode, window_size, features, dir_scalers, scale=False,
-#                      time_lag=1, LAG_MIN=3):
 def get_models_preds(config, subjects_traintest, subjects_models, features, dir_scalers, scale=False, LAG_MIN=3):
     subjstest_subjspreds = {}
     for subjtest, traintest in subjects_traintest.items():
