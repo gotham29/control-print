@@ -1,14 +1,20 @@
-import numpy as np
 import os
+import sys
+import numpy as np
 import pandas as pd
+import datetime as dt
 from os.path import isfile, join
 
+_SOURCE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+sys.path.append(_SOURCE_DIR)
+
+from source.utils.utils import add_timecol
 
 def get_dists(row):
     return np.sqrt(row['dists_x'] ** 2) + np.sqrt(row['dists_y'] ** 2) + np.sqrt(row['dists_z'] ** 2)
 
 
-def preprocess(dir_input, dir_output, test_indices, hz, colinds_colnames):
+def preprocess(dir_input, dir_output, test_indices, hz, time_col, colinds_colnames):
     print('\nPreprocessing data...')
 
     # get agg from hz
@@ -58,13 +64,15 @@ def preprocess(dir_input, dir_output, test_indices, hz, colinds_colnames):
             'test': pd.concat(inds_data_test.values(), axis=0),
         }
 
-    # write out
     print('  writing csvs...')
     for subj, traintest in subjects_traintest.items():
+        # add timecol if needed
+        if time_col not in traintest['train']:
+            traintest['train'] = add_timecol(traintest['train'], time_col)
+            traintest['test'] = add_timecol(traintest['test'], time_col)
+        # write out
         path_train = os.path.join(dir_output, f"subj={subj}_train.csv")
         path_test = os.path.join(dir_output, f"subj={subj}_test.csv")
-        traintest['train'].to_csv(path_train, index=False)
-        traintest['test'].to_csv(path_test, index=False)
 
     return subjects_traintest
 

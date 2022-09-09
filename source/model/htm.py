@@ -26,7 +26,7 @@ def reset_htm_config(htm_config_orig):
 
 def get_htm_dist(mod_dict, test, learn=False, predictor_config={'enable': False}):
     aScores = []
-    htm_multimodels = False if len(mod_dict) == 1 else True
+    htm_multimodels = False if len(mod_dict) == 1 else True  #len(mod_dict.features_encs) else True #
     for timestep, row in test.iterrows():
         features_data = dict(row)
         if htm_multimodels:
@@ -59,18 +59,12 @@ def train_save_htm_models(subjects_traintest, config):
                                                         features_models={})
         multiple_models = True if len(subjects_models[subj]) > 1 else False
         if multiple_models:
-            for feat in features: #config['features']:
+            for feat in features:
                 outpath = os.path.join(models_dir, f"{feat}.pkl")
                 save_data_as_pickle(subjects_models[subj][feat], outpath)
         else:
-            multi_feat = f"megamodel_features={len(features)}"  #len(config['features'])
+            multi_feat = f"megamodel_features={len(features)}"
             outpath = os.path.join(models_dir, f"{multi_feat}.pkl")
-            # # DEBUG
-            # try:
-            #     save_data_as_pickle(subjects_models[subj][multi_feat], outpath)
-            # except Exception as e:
-            #     print(f"error --> {e}")
-            #     print(f"subjects_models[subj] KEYS = {list(subjects_models[subj].keys())}")
             save_data_as_pickle(subjects_models[subj][multi_feat], outpath)
 
     return subjects_models

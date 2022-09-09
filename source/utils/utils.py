@@ -4,6 +4,12 @@ import pickle
 import pandas as pd
 import datetime as dt
 import yaml
+from typing import List, Optional, Sequence, Tuple, Union
+
+from htm_source.utils.utils import load_models as load_models_htm
+from ts_source.utils.utils import get_dir_data, MODNAMES_OBJTYPES
+from darts.models.forecasting.forecasting_model import ForecastingModel
+from darts.models.forecasting.torch_forecasting_model import TorchForecastingModel
 
 
 ALGS_KNOWN = ['htm', 'dtw', 'edr',
@@ -128,7 +134,7 @@ def validate_config(config):
             dir_alg = os.path.join(dir_, f"ALG={config['alg']}")
             make_dir(dir_alg)
 
-            folder_sub = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES={config['features']};SCALING={config['scaling']};GRIDSEARCH={config['do_gridsearch']};"
+            folder_sub = f"HZ={config['hz']};TESTS={config['test_indices']};FEATURES_PRED={config['features']['pred']};SCALING={config['scaling']};GRIDSEARCH={config['do_gridsearch']};"
             if config['algs_types'][config['alg']] == 'distance':
                 folder_sub += f"TESTMODE={config['test_mode']};"
                 if config['test_mode'] == 'online':
@@ -221,14 +227,15 @@ def validate_config(config):
         invalid_fields) == 0, f"  Invalid fields found --> {sorted(invalid_fields)}; \n  Valids --> {list(config['colinds_features'].values())}"
 
     print(f"  alg            = {config['alg']}")
-    print(f"  test_mode      = {config['test_mode']}")
     print(f"  train_models   = {config['train_models']}")
-    print(f"  scaling        = {config['scaling']}")
     print(f"  hz             = {config['hz']}")
-    # print(f"  time_lag       = {config['time_lag']}")
-    print(f"  window_size    = {config['window_size']}")
     print(f"  test_indices   = {config['test_indices']}")
     print(f"  features       = {config['features']}")
+    print(f"  scaling        = {config['scaling']}")
+    if config['algs_types'][config['alg']] == 'distance':
+        print(f"  test_mode      = {config['test_mode']}")
+        print(f"  window_size    = {config['window_size']}")
+
     if config['alg'] == 'lstm':
         print(f"  batch_size     = {config['lstm_config']['batch_size']}")
     if config['data_cap'] < 1000:
@@ -239,27 +246,42 @@ def validate_config(config):
     return config
 
 
-def load_models(dir_models):
+def load_models(dir_:str,
+                alg:str='htm',
+                ftype:Optional[str]='pkl',
+                search:Optional[str]='walk',
+                **kwargs):
     """
     Purpose:
-        Load pkl models for each feature from dir
+        Load ftype models for each feature from dir
     Inputs:
-        dir_models
+        dir_
             type: str
-            meaning: path to dir where pkl models are loaded from
+            meaning: path to dir where ftype models are loaded from
     Outputs:
         features_models
             type: dict
             meaning: model obj for each feature
     """
-    pkl_files = [f for f in os.listdir(dir_models) if '.pkl' in f]
-    print(f"\nLoading {len(pkl_files)} models...")
+    sub_dirs = [f for f in os.listdir(dir_) if f!='.DS_Store']
     features_models = {}
-    for f in pkl_files:
-        pkl_path = os.path.join(dir_models, f)
-        model = load_pickle_object_as_data(pkl_path)
-        features_models[f.replace('.pkl', '')] = model
+    for sd in sub_dirs:
+        sd_path = os.path.join(dir_, sd)
+        if alg == 'htm':
+            model = load_models_htm(sd_path) #load_pickle_object_as_data(path_)
+        else:  #darts model
+            filenames = get_dir_data(dir_=sd_path, ftype=ftype, search=search, rtype='filename')
+            filenames_uni = list(set([f.split('.')[0] for f in filenames]))
+            filename_model = filenames_uni[0]
+            path_ = os.path.join(dir_, sd, f"{filename_model}.{ftype}")
+            model = load_darts(path_, filename_model)
+        features_models[sd] = model
     return features_models
+
+
+def load_darts(path_, darts_modeltype):
+    model = MODNAMES_OBJTYPES[darts_modeltype].load(path_)
+    return model
 
 
 def load_pickle_object_as_data(file_path):
@@ -285,3 +307,11 @@ def add_timecol(df, time_col):
     ts_vals = [base + dt.timedelta(days=_) for _ in range(df.shape[0])]
     df.insert(0, time_col, ts_vals)
     return df
+
+
+def sort_dict(dict_, by='value', ascending=False):
+    item_i = 1 if by=='value' else 0
+    dict_sorted = {k: v for k, v in sorted(dict_.items(),
+                                            key=lambda item: item[item_i],
+                                            reverse=ascending)}
+    return dict_sorted

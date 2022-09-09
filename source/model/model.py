@@ -14,7 +14,7 @@ from source.model.dtw import get_dtw_dist
 from source.model.edr import get_edr_dist
 from source.model.htm import train_save_htm_models, get_htm_dist
 from source.model.arima import train_arima
-from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data, add_timecol
+from source.utils.utils import make_dir, save_data_as_pickle, load_pickle_object_as_data, add_timecol, sort_dict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from numpy import array
@@ -90,13 +90,7 @@ def get_windowed_data(data, window_size):
     return array(rows)
 
 
-# def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features, test_mode, window_size, time_lag):
 def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
-    # Get all model features
-    features_model = []
-    for ftype, feats in features.items():
-        features_model += feats
-    features_model = list(set(features_model))
     # Get dists (pred erres) between all subjs
     subjstest_subjsdists = {}
     for subjtest, subjspreds in subjstest_subjspreds.items():
@@ -109,11 +103,12 @@ def get_models_dists_pred(subjstest_subjspreds, subjects_traintest, features):
             subjtest_true_adj = subjtest_true.tail(len(preds))
             """
             if test_mode == 'batch':
-                subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features_model].values, preds[features_model].values)  #y_true, preds
+                subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features].values, preds[features].values)  #y_true, preds
             else:
-                subjstest_subjsdists[subjtest][subjpred] = get_diff_online(subjtest_true_adj[features_model].values, preds[features_model].values, window_size)  #y_true, preds, window_size
+                subjstest_subjsdists[subjtest][subjpred] = get_diff_online(subjtest_true_adj[features].values, preds[features].values, window_size)  #y_true, preds, window_size
             """
-            subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features_model].values, preds[features_model].values)
+            subjstest_subjsdists[subjtest][subjpred] = get_diff(subjtest_true_adj[features].values,
+                                                                preds[features].values)
     return subjstest_subjsdists
 
 """
@@ -166,7 +161,7 @@ def get_dist(data1, data2, alg):
     return dist
 
 
-def get_models_anomscores(subjects_traintest, subjects_models, features):
+def get_models_anomscores(subjects_traintest, subjects_models):  #features
     subjstest_subjsanoms = {}
     for subjtest1, mod_dict in subjects_models.items():
         subjstest_subjsanoms[subjtest1] = {}
@@ -255,14 +250,18 @@ def train_save_pred_models(subjects_traintest, config, alg):  #time_lag=1
         config_ts = {k:v for k,v in config.items()}
         config_ts['train_models'] = True
         config_ts['modnames_grids'] = {k:v for k,v in config_ts['modnames_grids'].items() if k == alg}
-        if config_ts['time_col'] not in traintest['train']:
-            traintest['train'] = add_timecol(traintest['train'], config_ts['time_col'])
-            traintest['test'] = add_timecol(traintest['test'], config_ts['time_col'])
+        # if config_ts['time_col'] not in traintest['train']:
+        #     traintest['train'] = add_timecol(traintest['train'], config_ts['time_col'])
+        #     traintest['test'] = add_timecol(traintest['test'], config_ts['time_col'])
 
         output_dirs = {'data': os.path.join(config['dirs']['data'], subj),
                         'results': os.path.join(config['dirs']['results'], subj),
                         'models': os.path.join(config['dirs']['models'], subj),
                         'scalers': os.path.join(config['dirs']['scalers'], subj)}
+
+        if os.path.exists(output_dirs['models']):
+            print("  --> found")
+            continue
 
         modnames_models, modname_best, modnames_preds       = run_pipeline(config=config_ts,
                                                                             data=traintest['train'],

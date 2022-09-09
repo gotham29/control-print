@@ -15,6 +15,7 @@ from source.model.htm import train_save_htm_models
 from source.utils.utils import (load_config,
                                 load_models,
                                 validate_config,
+                                sort_dict,
                                 get_args)
 
 
@@ -27,15 +28,15 @@ def run_pipeline(config):
                                     dir_output=config['dirs']['data'],
                                     test_indices=config['test_indices'],
                                     hz=config['hz'],
+                                    time_col=config['time_col'],
                                     colinds_colnames=config['colinds_features'])
 
     # GET MODELS
     alg_type = config['algs_types'][config['alg']]
 
     if alg_type in ['prediction', 'anomaly']:
-        if not config['train_models']:  # LOAD
-            subjects_models = load_models(dir_models=config['dirs']['models'])
-        else:  # TRAIN
+        # TRAIN
+        if config['train_models']:
             if alg_type == 'prediction':
                 subjects_models = train_save_pred_models(subjects_traintest=subjects_traintest,
                                                             config=config,
@@ -43,6 +44,8 @@ def run_pipeline(config):
             else:  #alg_type == 'anomaly':
                 subjects_models = train_save_htm_models(subjects_traintest=subjects_traintest,
                                                         config=config)
+        # LOAD
+        subjects_models = load_models(dir_=config['dirs']['models'], alg=config['alg'], ftype='pkl', search='walk')
 
     # GET DISTANCES FROM ALL TEST SPLITS TO ALL MODELS
     if alg_type == 'prediction':
@@ -52,15 +55,15 @@ def run_pipeline(config):
                                                 subjects_models=subjects_models,
                                                 dir_scalers=config['dirs']['scalers'],
                                                 scale=config['scaling'],
-                                                features=config['features'])
+                                                features=config['features']['in'])
         print(f'\nGetting all models dists from all {len(subjects_traintest)} subjs test...')
         subjstest_subjsdists = get_models_dists_pred(subjstest_subjspreds=subjstest_subjspreds,
                                                         subjects_traintest=subjects_traintest,
-                                                        features=config['features'])
+                                                        features=config['features']['pred'])
     elif alg_type == 'anomaly':
         subjstest_subjsdists = get_models_anomscores(subjects_traintest,
-                                                     subjects_models,
-                                                     config['features'])
+                                                    #  config['features'],
+                                                    subjects_models)
     else:  # alg_type == 'distance'
         print(f'\nGetting all models dists from all {len(subjects_traintest)} subjs test...')
         subjstest_subjsdists = get_models_dists_dist(subjects_traintest,

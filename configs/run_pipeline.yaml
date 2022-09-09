@@ -1,15 +1,17 @@
-alg: htm  #htm, dtw, edr, VARIMA, NBEATSModel, TCNModel, TransformerModel, RNNModel, LightGBMModel
+alg: NBEATSModel  #TCNModel, TransformerModel, RNNModel
+#htm, #dtw, #edr, VARIMA, LightGBMModel
+
+train_models: True  #Fa;lse
 hz: 10
 do_gridsearch: False
 test_prop: 0.3
 data_cap: 100000 #300
-train_models: True
 forecast_horizon: 1
 time_col: timestamp
 eval_metric: rmse #mae, mse, rmse, mape, mase, ope, marre, r2_score, dtw_metric
 ####################
 test_mode: online #batch, online
-window_size: 10
+window_size: 1
 scaling: False  #false, minmax, standard
 
 features:
