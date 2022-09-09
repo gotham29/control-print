@@ -4,126 +4,16 @@ xlabel: Experimental Settings
 ylabel: Rank Scores
 
 plotbars_filtertraits:
-# ALGS
-  LGBM: { ALG=: LightGBMModel, HZ=: 10;}
-  VARIMA: { ALG=: VARIMA, HZ=: 10;}
-  HTM: { ALG=: htm, HZ=: 10;}
+  EDR: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
+  # EDR--batch: { ALG=: edr, HZ=: 10;, TESTMODE=: batch;}
+  DTW: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
+  # DTW--batch: { ALG=: dtw, HZ=: 10;, TESTMODE=: batch;}
   NBEATSModel: { ALG=: NBEATSModel, HZ=: 10;}
-  TCNModel: { ALG=: TCNModel, HZ=: 10;}
+  VARIMA: { ALG=: VARIMA, HZ=: 10;}
+  LGBM: { ALG=: LightGBMModel, HZ=: 10;}
+  HTM: { ALG=: htm, HZ=: 10;}
+  # TCNModel: { ALG=: TCNModel, HZ=: 10;}
   # RNNModel: { ALG=: RNNModel, HZ=: 10;}
   # TransformerModel: { ALG=: TransformerModel, HZ=: 10;}
-  DTW: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  DTW--batch: { ALG=: dtw, HZ=: 10;, TESTMODE=: batch;}
-  EDR: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  EDR--batch: { ALG=: edr, HZ=: 10;, TESTMODE=: batch;}
-  # DTW-batch: { ALG=: dtw, HZ=: 10;, TESTMODE=: batch;}
   # DTW-online-window=1: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  # DTW-online-window=10: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 10;}
-  # DTW-online-window=100: { ALG=: dtw, HZ=: 10;, TESTMODE=: online;, WINDOW=: 100;}
-  # EDR-batch: { ALG=: edr, HZ=: 10;, TESTMODE=: batch;}
   # EDR-online-window=1: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 1;}
-  # EDR-online-window=10: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 10;}
-  # EDR-online-window=100: { ALG=: edr, HZ=: 10;, TESTMODE=: online;, WINDOW=: 100;}
-
-
-#1hz
-#  LSTM-batch: { ALG=: lstm, TESTMODE=: batch, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  LSTM-online-1window: { ALG=: lstm, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 1; }
-#  LSTM-online-10window: { ALG=: lstm, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 10; }
-#  LSTM-online-100window: { ALG=: lstm, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 100; }
-#  DTW-batch: { ALG=: dtw, TESTMODE=: batch, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  DTW-online-1window: { ALG=: dtw, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 1; }
-#  DTW-online-10window: { ALG=: dtw, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 10; }
-#  DTW-online-100window: { ALG=: dtw, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 100; }
-#  EDR-batch: { ALG=: edr, TESTMODE=: batch, HZ=: 1;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-#  EDR-online-1window: { ALG=: edr, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 1; }
-#  EDR-online-10window: { ALG=: edr, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 10; }
-#  EDR-online-100window: { ALG=: edr, TESTMODE=: online, HZ=: 1;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 100; }
-#  HTM-online: { ALG=: htm, HZ=: 1;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
-
-
-  #3hz
-  # LSTM-batch: { ALG=: lstm, TESTMODE=: batch, HZ=: 3;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-  # LSTM-online-window=1-time_lag=1: { ALG=: lstm, TESTMODE=: online, HZ=: 3;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 1;, TIME_LAG=: 1; }
-
-
-  #5hz
-  # LSTM-batch: { ALG=: lstm, TESTMODE=: batch, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-  # LSTM-online-1window: { ALG=: lstm, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 1; }
-  # LSTM-online-10window: { ALG=: lstm, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 10; }
-  # LSTM-online-100window: { ALG=: lstm, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 100; }
-  # DTW-batch: { ALG=: dtw, TESTMODE=: batch, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-  # DTW-online-1window: { ALG=: dtw, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 1; }
-  # DTW-online-10window: { ALG=: dtw, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 10; }
-  # DTW-online-100window: { ALG=: dtw, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']", WINDOW=: 100; }
-  # EDR-batch: { ALG=: edr, TESTMODE=: batch, HZ=: 5;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-  # EDR-online-1window: { ALG=: edr, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 1; }
-  # EDR-online-10window: { ALG=: edr, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 10; }
-  # EDR-online-100window: { ALG=: edr, TESTMODE=: online, HZ=: 5;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']", WINDOW=: 100; }
-  # HTM-online: { ALG=: htm, HZ=: 5;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
-
-
-  # FIELD-SETS
-#  HTM-online-10hz-xs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
-#  HTM-online-10hz-ys: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
-#  HTM-online-10hz-zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
-#  HTM-online-10hz-dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
-#  HTM-online-10hz-xs,ys: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
-#  HTM-online-10hz-xs,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
-#  HTM-online-10hz-ys,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
-#  HTM-online-10hz-xs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
-#  HTM-online-10hz-ys,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
-#  HTM-online-10hz-zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
-#  HTM-online-10hz-ys,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-#  HTM-online-10hz-xs,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
-#  HTM-online-10hz-xs,ys,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
-#  HTM-online-10hz-xs,ys,zs: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  HTM-online-10hz-xs,ys,zs,dists: { ALG=: htm, TESTMODE=: online, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
-
-#  LSTM-batch-10hz-xs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
-#  LSTM-batch-10hz-ys: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
-#  LSTM-batch-10hz-zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
-#  LSTM-batch-10hz-dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
-#  LSTM-batch-10hz-xs,ys: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
-#  LSTM-batch-10hz-xs,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
-#  LSTM-batch-10hz-ys,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
-#  LSTM-batch-10hz-xs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
-#  LSTM-batch-10hz-ys,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
-#  LSTM-batch-10hz-zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
-#  LSTM-batch-10hz-ys,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-#  LSTM-batch-10hz-xs,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
-#  LSTM-batch-10hz-xs,ys,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
-#  LSTM-batch-10hz-xs,ys,zs: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  LSTM-batch-10hz-xs,ys,zs,dists: { ALG=: lstm, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
-
-#  DTW-batch-10hz-xs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
-#  DTW-batch-10hz-ys: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
-#  DTW-batch-10hz-zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
-#  DTW-batch-10hz-dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
-#  DTW-batch-10hz-xs,ys: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
-#  DTW-batch-10hz-xs,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
-#  DTW-batch-10hz-ys,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
-#  DTW-batch-10hz-xs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
-#  DTW-batch-10hz-ys,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
-#  DTW-batch-10hz-zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
-#  DTW-batch-10hz-ys,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-#  DTW-batch-10hz-xs,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
-#  DTW-batch-10hz-xs,ys,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
-#  DTW-batch-10hz-xs,ys,zs: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  DTW-batch-10hz-xs,ys,zs,dists: { ALG=: dtw, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }
-
-#  EDR-batch-10hz-xs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs']" }
-#  EDR-batch-10hz-ys: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys']" }
-#  EDR-batch-10hz-zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs']" }
-#  EDR-batch-10hz-dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['dists']" }
-#  EDR-batch-10hz-xs,ys: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys']" }
-#  EDR-batch-10hz-xs,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs']" }
-#  EDR-batch-10hz-ys,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs']" }
-#  EDR-batch-10hz-xs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'dists']" }
-#  EDR-batch-10hz-ys,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'dists']" }
-#  EDR-batch-10hz-zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['zs', 'dists']" }
-#  EDR-batch-10hz-ys,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['ys', 'zs', 'dists']" }
-#  EDR-batch-10hz-xs,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'zs', 'dists']" }
-#  EDR-batch-10hz-xs,ys,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'dists']" }
-#  EDR-batch-10hz-xs,ys,zs: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs']" }
-#  EDR-batch-10hz-xs,ys,zs,dists: { ALG=: edr, TESTMODE=: batch, HZ=: 10;, SCALING=: 'False', FEATURES=: "['xs', 'ys', 'zs', 'dists']" }

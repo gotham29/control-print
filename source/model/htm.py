@@ -11,14 +11,9 @@ from htm_source.pipeline.htm_batch_runner import run_batch
 from htm_source.config.config import load_config, save_config
 
 
-def reset_htm_config(htm_config_orig):
-    keys_keep = ['features',
-                 'models_state',
-                 'timesteps_stop']
-    keys_keep_state = ['model_for_each_feature',
-                       'save_outputs_accumulated',
-                       'track_iter',
-                       'track_tm']
+def reset_htm_config(htm_config_orig,
+                    keys_keep = ['features', 'models_state', 'timesteps_stop'],
+                    keys_keep_state = ['model_for_each_feature', 'save_outputs_accumulated', 'track_iter', 'track_tm']):
     htm_config = {k: v for k, v in htm_config_orig.items() if k in keys_keep}
     htm_config['models_state'] = {k: v for k, v in htm_config['models_state'].items() if k in keys_keep_state}
     return htm_config_orig
@@ -26,7 +21,7 @@ def reset_htm_config(htm_config_orig):
 
 def get_htm_dist(mod_dict, test, learn=False, predictor_config={'enable': False}):
     aScores = []
-    htm_multimodels = False if len(mod_dict) == 1 else True  #len(mod_dict.features_encs) else True #
+    htm_multimodels = False if len(mod_dict) == 1 else True
     for timestep, row in test.iterrows():
         features_data = dict(row)
         if htm_multimodels:
